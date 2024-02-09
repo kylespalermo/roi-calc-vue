@@ -1,0 +1,45 @@
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app"></div>
+</body>
+<!-- copy paste the following into webflow's custom page code -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue3-sfc-loader"></script>
+<script>
+  const options = {
+
+        moduleCache: {
+          vue: Vue,
+        },
+
+        getFile(url) {
+          return fetch(url).then(response => response.ok ? response.text() : Promise.reject(response));
+        },
+
+        addStyle(styleStr) {
+          const style = document.createElement('style');
+          style.textContent = styleStr;
+          const ref = document.head.getElementsByTagName('style')[0] || null;
+          document.head.insertBefore(style, ref);
+        },
+
+        log(type, ...args) {
+          console.log(type, ...args);
+        }
+      }
+    
+  const { loadModule, version } = window["vue3-sfc-loader"];
+
+  const app = Vue.createApp({
+    components: {
+      'calculator': Vue.defineAsyncComponent(() => loadModule('calculator.vue', options)),
+    },
+    template: `<calculator></calculator>`
+  });
+
+  app.mount('#app');
+</script>

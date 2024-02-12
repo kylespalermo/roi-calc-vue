@@ -17,7 +17,69 @@ export default {
       workSchedule: {
         hoursWorkedPerWeek: 40,
         weeksWorkedPerYear: 48,
-      }
+      },
+      reportType: 'saas',
+      dataStaffActivities: {
+            saas: {
+                buildingIntegrations: {
+                    withoutFivetran: 5,
+                    withoutFivetranLabel: 'Researching APIs, writing new code',
+                    withFivetran: .5,
+                    withFivetranLabel: 'Adding new connectors in Fivetran'
+                }, 
+                buildingTransformations: {
+                    withoutFivetran: 10,
+                    withoutFivetranLabel: 'Building transformations for new models',
+                    withFivetran: 5,
+                    withFivetranLabel: 'Building new models with Fivetran packages where possible',
+
+                },
+                maintainingIntegrations: {
+                    withoutFivetran: 15,
+                    withoutFivetranLabel: 'Updating API versions, adding new fields, fixing bugs',
+                    withFivetran: 1,
+                    withFivetranLabel: 'Monitoring Fivetran pipeline health'
+                },
+                maintainingTransformations: {
+                    withoutFivetran: 5,
+                    withoutFivetranLabel: 'Adding transformations for existing models',
+                    withFivetran: 4,
+                    withFivetranLabel: 'Fivetran managed packages - you just need to maintain custom code',
+                },
+                deploymentAndOrchestration: {
+                    withoutFivetran: 5,
+                    withoutFivetranLabel: 'Promoting changes through dev/test, Co-ordinating pipeline runs',
+                    withFivetran: 1,
+                    withFivetranLabel: 'Fivetran API, scheduler, transformations'
+                }
+            },
+            databases: {
+                totalBuildTimePerEngineer: {
+                    withoutFivetran: 5,
+                    withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    withFivetran: 5,
+                    withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                },
+                maintenanceTimePerEngineer: {
+                    withoutFivetran: 5,
+                    withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    withFivetran: 5,
+                    withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                },
+                dataUptime: {
+                    withoutFivetran: 99.90,
+                    withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    withFivetran: 99.99,
+                    withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                },
+                costOfDestination: {
+                    withoutFivetran: 100000,
+                    withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    withFivetran: 100000,
+                    withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                }
+            }
+        }
     }
   },
   computed: {
@@ -40,7 +102,7 @@ export default {
 <template>
   <main>
     <h1>Fivetran ROI Calculator</h1>
-    <section class="controls">
+    <section class="controls" id="company-profile">
         <h2>Company profile</h2>
         <fieldset>
             <legend>Contact information</legend>
@@ -71,6 +133,53 @@ export default {
                 </div>
             </div>
         </fieldset>
+        <fieldset>
+            <legend>Work schedule</legend>
+            <div class="input-row">
+                <div class="input-label-box-horiz">
+                    <label :for="`${kebabize('hoursWorkedPerWeek')}`">{{ sentencize('hoursWorkedPerWeek') }}</label>
+                    <input type="number" v-model="workSchedule.hoursWorkedPerWeek" :defaultValue="workSchedule.hoursWorkedPerWeek">
+                </div>
+                <div class="input-label-box-horiz">
+                    <label :for="`${kebabize('weeksWorkedPerYear')}`">{{ sentencize('weeksWorkedPerYear') }}</label>
+                    <input type="number" v-model="workSchedule.weeksWorkedPerYear" :defaultValue="workSchedule.weeksWorkedPerYear">
+                </div>
+            </div>
+        </fieldset>
+    </section>
+    <section class="controls" id="data-staff-activities">
+        <h2>Data staff activities</h2>
+        <fieldset class="segmented-control" id="report-type-control">
+            <div>Select a report type:</div>
+            <div>
+                <input type="radio" id="saas" name="report-type" value="saas" v-model="reportType" checked />
+                <label for="saas">SaaS</label>
+            </div>
+            <div>
+                <input type="radio" id="databases" name="report-type" value="databases" v-model="reportType" />
+                <label for="databases">Databases</label>
+            </div>
+        </fieldset>
+        <div id="engineering-function">
+            <div class="table-header">
+                <span class="input-table-header">Engineering function</span>
+                <span class="input-table-header">Activities without Fivetran</span>
+                <span class="input-table-header">Activities with Fivetran</span>
+            </div>
+            <fieldset class="data-staff-function" v-for="(value, key) in this.dataStaffActivities[this.reportType]">
+                <div>{{ sentencize(key) }}</div>
+                <div class="input-label-caption">
+                    <label :for="`${kebabize(key)}`"><i>{{ value.withoutFivetranLabel }}</i></label>
+                    {{ console.log(value) }}
+                    <input type="number" v-model="value.withoutFivetran" :defaultValue="value.withoutFivetran">
+                </div>
+                <div class="input-label-caption">
+                    <label :for="`${kebabize(key)}`"><i>{{ value.withFivetranLabel }}</i></label>
+                    {{ console.log(value) }}
+                    <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran">
+                </div>
+            </fieldset>
+        </div>
     </section>
   </main>
 </template>
@@ -95,8 +204,6 @@ fieldset {
     padding: 0 0 0 0;
     margin: 0;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
     gap: 16px;
 }
 
@@ -111,6 +218,7 @@ main {
     display: flex;
     align-items: center;
     flex-direction: column;
+    gap: 60px;
 }
 
 h1, h2, h3, legend {
@@ -154,23 +262,28 @@ section {
 .controls:first-of-type fieldset:nth-of-type(1) {
     grid-column: 1 / span 4;
     grid-row: 2 / span 3;
+    display: flex;
+    flex-direction: column;
 }
 
 .controls:first-of-type fieldset:nth-of-type(2) {
     grid-column: 6 / span 6;
+    margin-bottom: 32px;
 }
 
 .controls:first-of-type fieldset:nth-of-type(3) {
     grid-column: 6 / span 6;
+    margin-bottom: 32px;
 }
 
 .controls:first-of-type fieldset:nth-of-type(4) {
     grid-column: 6 / span 6;
+    margin-bottom: 32px;
 }
 
 
 input, output {
-    padding: 6px 2px 6px 2px;
+    padding: 6px 2px 6px 12px;
     font-size: 14px;
     line-height: 20px;
     border-radius: 2px;
@@ -185,7 +298,7 @@ input {
     grid-column: 1 / span 12;
 }
 
-label {
+label, .input-table-header {
     font-size: 14px;
     line-height: 20px;
     font-weight: 500;
@@ -215,11 +328,11 @@ label {
 }
 
 .input-label-box-horiz input, output {
-    flex: 0 1 33.33%;
+    flex: 0 1 40%;
 }
 
 .input-label-box-horiz label {
-    flex: 1 0 66.66%;
+    flex: 1 0 60%;
 }
 
 output {
@@ -228,6 +341,66 @@ output {
 
 .denom-dollar::before {
     content: '$'
+}
+
+#report-type-control {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    grid-column: 1 / span 12;
+    margin-bottom: 48px;
+}
+
+#engineering-function {
+    grid-column: 1 / span 9;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    legend {
+        padding: 0px;
+        border: none;
+    }
+    .table-header {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 20px;
+        span {
+            grid-column: auto / span 3;
+            text-align: right;
+        }
+        span:nth-child(1) {
+            text-align: left;
+        }
+    }
+
+}
+
+.table-header {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-90);
+}
+
+.data-staff-function {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 20px;
+    * {
+        grid-column: auto / span 3;
+    }
+}
+
+.input-label-caption {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    label {
+        font-size: 13px;
+        line-height: 16px;
+        font-weight: 400;
+        text-align: right;
+        flex: 0 0 60%;
+    }
 }
 
 </style>

@@ -332,7 +332,7 @@ export default {
                     <p>Questions? Contact {{ outputs.companyDetails.fivetranContactEmail }}</p>
                 </hgroup>
                 <div>
-                    <img src="fivetran.svg">
+                    <img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg">
                     <span>fivetran.com</span>
                 </div>
             </div>

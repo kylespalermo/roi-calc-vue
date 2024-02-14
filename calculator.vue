@@ -658,6 +658,7 @@ input[type=submit] {
 
 main {
     display: flex !important;
+    row-gap: 60px;
     flex-direction: column;
     align-items: center;
 }

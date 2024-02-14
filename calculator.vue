@@ -22,69 +22,93 @@ export default {
             },
             reportType: 'saas',
             numberOfEngineersWorkingOnPipelines: null,
-            dataStaffActivities: {
+            dataStackAndStaffing: {
                 saas: {
-                    buildingIntegrations: {
-                        withoutFivetran: 5,
-                        withoutFivetranLabel: 'Researching APIs, writing new code',
-                        withFivetran: .5,
-                        withFivetranLabel: 'Adding new connectors in Fivetran'
+                    engineeringFunction: {
+                        buildingIntegrations: {
+                            withoutFivetran: 5,
+                            withoutFivetranLabel: 'Researching APIs, writing new code',
+                            withFivetran: .5,
+                            withFivetranLabel: 'Adding new connectors in Fivetran'
+                        },
+                        buildingTransformations: {
+                            withoutFivetran: 10,
+                            withoutFivetranLabel: 'Building transformations for new models',
+                            withFivetran: 5,
+                            withFivetranLabel: 'Building new models with Fivetran packages where possible',
+                        },
+                        maintainingIntegrations: {
+                            withoutFivetran: 15,
+                            withoutFivetranLabel: 'Updating API versions, adding new fields, fixing bugs',
+                            withFivetran: 1,
+                            withFivetranLabel: 'Monitoring Fivetran pipeline health'
+                        },
+                        maintainingTransformations: {
+                            withoutFivetran: 5,
+                            withoutFivetranLabel: 'Adding transformations for existing models',
+                            withFivetran: 4,
+                            withFivetranLabel: 'Fivetran managed packages - you just need to maintain custom code',
+                        },
+                        deploymentAndOrchestration: {
+                            withoutFivetran: 5,
+                            withoutFivetranLabel: 'Promoting changes through dev/test, Co-ordinating pipeline runs',
+                            withFivetran: 1,
+                            withFivetranLabel: 'Fivetran API, scheduler, transformations'
+                        }
                     },
-                    buildingTransformations: {
-                        withoutFivetran: 10,
-                        withoutFivetranLabel: 'Building transformations for new models',
-                        withFivetran: 5,
-                        withFivetranLabel: 'Building new models with Fivetran packages where possible',
-                    },
-                    maintainingIntegrations: {
-                        withoutFivetran: 15,
-                        withoutFivetranLabel: 'Updating API versions, adding new fields, fixing bugs',
-                        withFivetran: 1,
-                        withFivetranLabel: 'Monitoring Fivetran pipeline health'
-                    },
-                    maintainingTransformations: {
-                        withoutFivetran: 5,
-                        withoutFivetranLabel: 'Adding transformations for existing models',
-                        withFivetran: 4,
-                        withFivetranLabel: 'Fivetran managed packages - you just need to maintain custom code',
-                    },
-                    deploymentAndOrchestration: {
-                        withoutFivetran: 5,
-                        withoutFivetranLabel: 'Promoting changes through dev/test, Co-ordinating pipeline runs',
-                        withFivetran: 1,
-                        withFivetranLabel: 'Fivetran API, scheduler, transformations'
+                    additionalComparisons: {
+                        annualCostsOfPipelineRelatedInfrastructure: {
+                            withoutFivetran: null,
+                            withFivetran: null,
+                        }
                     }
                 },
                 databases: {
-                    totalBuildTimePerEngineer: {
-                        withoutFivetran: 5,
-                        withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
-                        withFivetran: 5,
-                        withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    engineeringFunction: {
+                        totalBuildTimePerEngineer: {
+                            withoutFivetran: 5,
+                            withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                            withFivetran: 5,
+                            withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                        },
+                        maintenanceTimePerEngineer: {
+                            withoutFivetran: 5,
+                            withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                            withFivetran: 5,
+                            withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                        },
+                        dataUptime: {
+                            withoutFivetran: 99.90,
+                            withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                            withFivetran: 99.99,
+                            withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                        },
+                        costOfDestination: {
+                            withoutFivetran: 100000,
+                            withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                            withFivetran: 100000,
+                            withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                        }
                     },
-                    maintenanceTimePerEngineer: {
-                        withoutFivetran: 5,
-                        withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
-                        withFivetran: 5,
-                        withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    additionalComparisons: {
+                        annualCostsOfPipelineRelatedInfrastructure: {
+                            withoutFivetran: null,
+                            withFivetran: null,
+                        },
+                        dataUptime: {
+                            withoutFivetran: null,
+                            withFivetran: 99.99
+                        },
+                        costOfDestination: {
+                            withoutFivetran: null,
+                            withFivetran: null,
+                        }
                     },
-                    dataUptime: {
-                        withoutFivetran: 99.90,
-                        withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
-                        withFivetran: 99.99,
-                        withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
-                    },
-                    costOfDestination: {
-                        withoutFivetran: 100000,
-                        withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
-                        withFivetran: 100000,
-                        withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
+                    additionalCostInputs: {
+                        costOfDataDowntime: null,
+                        costOfAlternative: null,
                     }
                 }
-            },
-            additionalDatabasesInputs: {
-                costOfDataDowntime: 10000,
-                costOfAlternative: 10000,
             },
             outputs: {
                 companyDetails: {
@@ -99,7 +123,7 @@ export default {
         equivalentHourlyRate() {
             return Math.floor((this.currentStaffingCosts.averageSalary) / (this.workSchedule.weeksWorkedPerYear * this.workSchedule.hoursWorkedPerWeek));
         },
-        calculateActivitiesToBuildAndMaintainPipelines() {
+        calculateBuildMaintainCosts() {
             
             let calcs = {
                 annualCostOfBuildingPipelines: {
@@ -112,11 +136,11 @@ export default {
                 },
             }
 
-            calcs.annualCostOfBuildingPipelines.currentCosts = this.calculateAnnualCosts(this.dataStaffActivities.saas.buildingIntegrations.withoutFivetran, this.dataStaffActivities.saas.buildingTransformations.withoutFivetran)
-            calcs.annualCostOfBuildingPipelines.costsWithFivetran = this.calculateAnnualCosts(this.dataStaffActivities.saas.buildingIntegrations.withFivetran, this.dataStaffActivities.saas.buildingTransformations.withFivetran)
+            calcs.annualCostOfBuildingPipelines.currentCosts = this.calculateAnnualCosts(this.dataStackAndStaffing[this.reportType].engineeringFunction.buildingIntegrations.withoutFivetran, this.dataStackAndStaffing[this.reportType].engineeringFunction.buildingTransformations.withoutFivetran)
+            calcs.annualCostOfBuildingPipelines.costsWithFivetran = this.calculateAnnualCosts(this.dataStackAndStaffing[this.reportType].engineeringFunction.buildingIntegrations.withFivetran, this.dataStackAndStaffing[this.reportType].engineeringFunction.buildingTransformations.withFivetran)
 
-            calcs.annualCostOfMaintainingPipelines.currentCosts = this.calculateAnnualCosts(this.dataStaffActivities.saas.maintainingIntegrations.withoutFivetran, this.dataStaffActivities.saas.maintainingTransformations.withoutFivetran, this.dataStaffActivities.saas.deploymentAndOrchestration.withoutFivetran)
-            calcs.annualCostOfMaintainingPipelines.costsWithFivetran = this.calculateAnnualCosts(this.dataStaffActivities.saas.maintainingIntegrations.withFivetran, this.dataStaffActivities.saas.maintainingTransformations.withFivetran, this.dataStaffActivities.saas.deploymentAndOrchestration.withFivetran)
+            calcs.annualCostOfMaintainingPipelines.currentCosts = this.calculateAnnualCosts(this.dataStackAndStaffing[this.reportType].engineeringFunction.maintainingIntegrations.withoutFivetran, this.dataStackAndStaffing[this.reportType].engineeringFunction.maintainingTransformations.withoutFivetran, this.dataStackAndStaffing[this.reportType].engineeringFunction.deploymentAndOrchestration.withoutFivetran)
+            calcs.annualCostOfMaintainingPipelines.costsWithFivetran = this.calculateAnnualCosts(this.dataStackAndStaffing[this.reportType].engineeringFunction.maintainingIntegrations.withFivetran, this.dataStackAndStaffing[this.reportType].engineeringFunction.maintainingTransformations.withFivetran, this.dataStackAndStaffing[this.reportType].engineeringFunction.deploymentAndOrchestration.withFivetran)
             
      
 
@@ -124,15 +148,15 @@ export default {
         },
         totalWeeklyMaintainanceTimeWithFivetran() {
             let hrs = 0
-            for (let engFunction in this.dataStaffActivities.saas) {
-                hrs += this.dataStaffActivities.saas[engFunction].withFivetran;
+            for (let category in this.dataStackAndStaffing[this.reportType].engineeringFunction) {
+                hrs += this.dataStackAndStaffing[this.reportType].engineeringFunction[category].withFivetran;
             }
             return hrs;
         },
         totalWeeklyMaintainanceTimeWithoutFivetran() {
             let hrs = 0
-            for (let engFunction in this.dataStaffActivities.saas) {
-                hrs += this.dataStaffActivities.saas[engFunction].withoutFivetran;
+            for (let category in this.dataStackAndStaffing[this.reportType].engineeringFunction) {
+                hrs += this.dataStackAndStaffing[this.reportType].engineeringFunction[category].withoutFivetran;
             }
             return hrs;
         }
@@ -265,7 +289,7 @@ export default {
                         <span class="input-table-header text-right">Activities without Fivetran</span>
                         <span class="input-table-header text-right">Activities with Fivetran</span>
                     </div>
-                    <fieldset class="data-staff-function" v-for="(value, key) in this.dataStaffActivities[this.reportType]">
+                    <fieldset class="data-staff-function" v-for="(value, key) in this.dataStackAndStaffing[this.reportType].engineeringFunction">
                         <div>{{ sentencize(key) }}</div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withoutFivetranLabel }}</i></label>
@@ -279,10 +303,8 @@ export default {
                     </fieldset>
                     <div v-if="this.reportType === 'saas'" class="data-staff-function-outputs">
                         <div>Total weekly pipeline maintenance time per engineer</div>
-                        <div class="output-wrapper"><output><span class="denom-hours">{{
-                            totalWeeklyMaintainanceTimeWithoutFivetran }}</span></output></div>
-                        <div class="output-wrapper"><output><span class="denom-hours">{{
-                            totalWeeklyMaintainanceTimeWithFivetran }}</span></output></div>
+                        <div class="output-wrapper"><output><span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithoutFivetran }}</span></output></div>
+                        <div class="output-wrapper"><output><span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithFivetran }}</span></output></div>
                     </div>
                 </div>
                 <fieldset class="additional-database-inputs" v-if="this.reportType === 'databases'">
@@ -290,15 +312,11 @@ export default {
                     <div class="input-row">
                         <div class="input-label-box-horiz">
                             <label for="cost-of-data-downtime-per-hour">Cost of data downtime per hour</label>
-                            <input type="number" id="cost-of-data-downtime-per-hour" name="cost-of-data-downtime-per-hour"
-                                v-model="additionalDatabasesInputs.costOfDataDowntime"
-                                :defaultValue="additionalDatabasesInputs.costOfDataDowntime">
+                            <input type="number" id="cost-of-data-downtime-per-hour" name="cost-of-data-downtime-per-hour" v-model="dataStackAndStaffing.databases.additionalCostInputs.costOfDataDowntime">
                         </div>
                         <div class="input-label-box-horiz">
                             <label for="cost-of-alternative">Cost of alternative</label>
-                            <input type="number" id="cost-of-data-alternative" name="cost-of-alternative"
-                                v-model="additionalDatabasesInputs.costOfAlternative"
-                                :defaultValue="additionalDatabasesInputs.costOfAlternative">
+                            <input type="number" id="cost-of-data-alternative" name="cost-of-alternative" v-model="dataStackAndStaffing.databases.additionalCostInputs.costOfAlternative">
                         </div>
                     </div>
                 </fieldset>
@@ -326,15 +344,21 @@ export default {
             </div>
             <div class="table-row four-column">
                 <span class="input-table-header text-left">Annual cost of building pipelines</span>
-                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfBuildingPipelines.currentCosts) }}</span>
-                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfBuildingPipelines.costsWithFivetran) }}</span>
-                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfBuildingPipelines.currentCosts - this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfBuildingPipelines.costsWithFivetran) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfBuildingPipelines.currentCosts) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfBuildingPipelines.costsWithFivetran) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfBuildingPipelines.currentCosts - this.calculateBuildMaintainCosts.annualCostOfBuildingPipelines.costsWithFivetran) }}</span>
             </div>
             <div class="table-row four-column">
                 <span class="input-table-header text-left">Annual cost of maintaining pipelines</span>
-                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfMaintainingPipelines.currentCosts) }}</span>
-                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfMaintainingPipelines.costsWithFivetran) }}</span>
-                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfMaintainingPipelines.currentCosts - this.calculateActivitiesToBuildAndMaintainPipelines.annualCostOfMaintainingPipelines.costsWithFivetran) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.currentCosts) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.costsWithFivetran) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.currentCosts - this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.costsWithFivetran) }}</span>
+            </div>
+            <div class="table-row four-column">
+                <span class="input-table-header text-left">Annual cost of pipeline related infrastructure</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.currentCosts) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.costsWithFivetran) }}</span>
+                <span class="input-table-header text-center">{{ this.formatDollars(this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.currentCosts - this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.costsWithFivetran) }}</span>
             </div>
         </div>
     </main>

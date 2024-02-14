@@ -532,12 +532,16 @@ output {
     content: '$'
 }
 
-#report-type-control {
+.segmented-control {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     grid-column: 1 / span 12;
     margin-bottom: 48px;
+    div {
+        display: flex;
+        flex-direction: row;
+    }
 }
 
 #engineering-function {

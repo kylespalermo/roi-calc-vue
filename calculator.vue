@@ -3,7 +3,7 @@
 export default {
     data() {
         return {
-            complete: true,
+            complete: false, //toggle this to true to keep report visible for dev purposes
             companyDetails: {
                 companyName: '',
                 prospectiveCustomerEmail: '',

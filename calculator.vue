@@ -268,7 +268,7 @@ export default {
             </div>
             <div class="form-block controls" id="data-staff-activities">
                 <h2>Data staff activities</h2>
-                <div class="input-label-box-horiz">
+                <div class="input-label-box-horiz grid-child-span-3" >
                     <label for="number-of-engineers-working-on-pipelines">Number of engineers working on pipelines</label>
                     <input type="number" v-model="numberOfEngineersWorkingOnPipelines" required>
                 </div>
@@ -426,8 +426,8 @@ h2 {
 legend {
     font-size: 14px;
     line-height: 16px;
-    border-bottom: 1px solid var(--gray-90);
-    padding: 0px 0px 12px 0px;
+    border-bottom: 1px solid var(--gray-90) !important;
+    padding: 0px 0px 12px 0px !important;
     margin-bottom: 16px;
     width: 100%;
 }
@@ -699,6 +699,10 @@ main {
     font-size: 12px;
     line-height: 16px;
     font-weight: 400;
+}
+
+.grid-child-span-3 {
+    grid-column: auto / span 3;
 }
 
 </style>

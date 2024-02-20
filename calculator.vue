@@ -110,7 +110,7 @@ export default {
                         }
                     },
                     additionalCostInputs: {
-                        costOfDataDowntime: null,//need to input a default here?
+                        costOfDataDowntimePerHour: null,//need to input a default here?
                         costOfAlternative: null,//need to input a default here?
                         costOfFivetran: null,
                     }
@@ -134,6 +134,21 @@ export default {
                         fivetranCostSavings: ''
                     },
                     annualCostsOfPipelineRelatedInfrastructure: {
+                        currentCosts: '',
+                        costsWithFivetran: '',
+                        fivetranCostSavings: ''
+                    },
+                    costOfAlternative: {
+                        currentCosts: '',
+                        costsWithFivetran: '',
+                        fivetranCostSavings: ''
+                    },
+                    costOfDestination: {
+                        currentCosts: '',
+                        costsWithFivetran: '',
+                        fivetranCostSavings: ''
+                    },
+                    costOfDataDowntime: {
                         currentCosts: '',
                         costsWithFivetran: '',
                         fivetranCostSavings: ''
@@ -254,6 +269,7 @@ export default {
             //this allows us to cache the data that populates the report, so the report isn't reactive if the inputs are adjsuted after generating it
             //the report only updates after this function runs
             //structure for "Fivetran cost savings", always the 3rd key/value in the object, is "current costs - costs with Fivetran"
+            //could probably refactor this to just make a deep copy of the original data object, if we cleaned up that structure
 
             //shorten the reference to report output object to make them more readable
             let r = this.reportOutputs;
@@ -277,7 +293,23 @@ export default {
             //annual cost of pipeline related infrastructure
             r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.currentCosts = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
             r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran;
-            r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.fivetranCostSavings = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran - this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran;
+            r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.fivetranCostSavings = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran - this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
+
+            //databases only: cost of alternative
+            r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts = this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfAlternative;
+            r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran = 0;
+            r.activitiesToBuildAndMaintainPipelines.costOfAlternative.fivetranCostSavings = r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran;
+
+            //databases only: cost of destination
+            r.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts = this.dataStackAndStaffing[this.reportType].additionalComparisons.costOfDestination.withoutFivetran;
+            r.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.costOfDestination.withFivetran;
+            r.activitiesToBuildAndMaintainPipelines.costOfDestination.fivetranCostSavings = r.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran;
+
+            //databases only: cost of data downtime
+            const hrsPerYear = 24*365;
+            r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts = hrsPerYear * this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfDataDowntimePerHour * (1 - (this.dataStackAndStaffing[this.reportType].additionalComparisons.dataUptime.withoutFivetran * .01))
+            r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran = hrsPerYear * this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfDataDowntimePerHour * (1 - (this.dataStackAndStaffing[this.reportType].additionalComparisons.dataUptime.withFivetran * .01))
+            r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.fivetranCostSavings =  r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran;
 
             //costOfEnvironment
             const costs = Object.values(r.activitiesToBuildAndMaintainPipelines)
@@ -494,6 +526,32 @@ export default {
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.costsWithFivetran) }}</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.fivetranCostSavings) }}</span>
                 </div>
+
+                <!-- Databases report only, Cost of alternative -->
+                <div v-if="this.reportType==='databases'" class="table-row four-column row-last-of-category">
+                    <span class="input-table-header text-left">Cost of alternative (licensing/compute)</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfAlternative.fivetranCostSavings) }}</span>
+                </div>
+
+                <!-- Databases report only, Cost of destination -->
+                <div v-if="this.reportType==='databases'" class="table-row four-column row-last-of-category">
+                    <span class="input-table-header text-left">Cost of destination (i.e. ingestion costs)</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDestination.fivetranCostSavings) }}</span>
+                </div>
+
+                <!-- Databases report only, Cost of data downtime -->
+                <div v-if="this.reportType==='databases'" class="table-row four-column row-last-of-category">
+                    <span class="input-table-header text-left">Cost of data downtime</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.fivetranCostSavings) }}</span>
+                </div>
+                
+                <!-- end of this group of lines, begin a new one -->
 
                 <!-- Cost of environment row -->
                 <div class="table-row four-column">

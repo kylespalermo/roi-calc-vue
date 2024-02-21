@@ -97,7 +97,7 @@ export default {
 
                         },
                         dataUptime: {
-                            withoutFivetran: null,//input an industry average here?
+                            withoutFivetran: 90,//input an industry average here?
                             withoutFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
                             withFivetran: 99.99,
                             withFivetranLabel: 'Eque porro quisquam est qui dolorem ipsum quia.',
@@ -337,16 +337,28 @@ export default {
 </script>
 
 <template>
+    <div class="top-nav">
+        <header>
+            <img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg" alt="Fivetran logo" href="https://www.fivetran.com/">
+            <nav>
+                <ul>
+                    <li><a href="https://fivetran.com/docs/getting-started">Docs</a></li>
+                    <li><a href="https://fivetran.com/pricing">Pricing</a></li>
+                    <li><a href="https://fivetran.com/login">Sign in</a></li>
+                </ul>
+            </nav>
+        </header>
+    </div>
     <main>
         <form onsubmit="return false">
-            <h1>Fivetran ROI Calculator</h1>
+            <h1>Fivetran ROI Calculator<span class="pill">Beta</span></h1>
             <div class="form-block controls" id="company-profile">
                 <h2>Company profile</h2>
                 <fieldset>
                     <legend>Contact information</legend>
-                    <div class="input-label-vertical" v-for="(value, key) in this.companyDetails">
+                    <div class="input-label-vertical" v-for="(value, key, index) in this.companyDetails">
                         <label :for="`${kebabize(key)}`">{{ sentencize(key) }}</label>
-                        <input type="text" v-model="companyDetails[key]" :id="`${kebabize(key)}`" required>
+                        <input v-model="companyDetails[key]" :id="`${kebabize(key)}`" type="text" required>
                     </div>
                 </fieldset>
                 <fieldset>
@@ -354,7 +366,7 @@ export default {
                     <div class="input-row">
                         <div class="input-label-box-horiz" v-for="(value, key, index) in this.fivetranEngagementTimeline">
                             <label :for="`${kebabize(key)}`">{{ this.labels[key] }}</label>
-                            <input type="number" v-model="fivetranEngagementTimeline[key]" :defaultValue="value" :step="key === 'fivetranContractPeriod' ? 12 : 1">
+                            <input type="number" v-model="fivetranEngagementTimeline[key]" :defaultValue="value" :step="key === 'fivetranContractPeriod' ? 12 : 1"  :min="key === 'fivetranContractPeriod' ? 12 : 0">
                         </div>
                     </div>
                 </fieldset>
@@ -363,7 +375,7 @@ export default {
                     <div class="input-row">
                         <div class="input-label-box-horiz">
                             <label :for="`${kebabize('averageSalary')}`">{{ this.labels.averageSalary }}</label>
-                            <input type="number" v-model="currentStaffingCosts.averageSalary" :defaultValue="currentStaffingCosts.averageSalary" step="1000">
+                            <input type="number" v-model="currentStaffingCosts.averageSalary" :defaultValue="currentStaffingCosts.averageSalary" step="1000" min="1000">
                         </div>
                         <div class="input-label-box-horiz">
                             <label :for="`${kebabize('equivalentHourlyRate')}`">{{ sentencize('equivalentHourlyRate') }}</label>
@@ -376,13 +388,11 @@ export default {
                     <div class="input-row">
                         <div class="input-label-box-horiz">
                             <label :for="`${kebabize('hoursWorkedPerWeek')}`">{{ sentencize('hoursWorkedPerWeek') }}</label>
-                            <input type="number" v-model="workSchedule.hoursWorkedPerWeek"
-                                :defaultValue="workSchedule.hoursWorkedPerWeek">
+                            <input type="number" v-model="workSchedule.hoursWorkedPerWeek" :defaultValue="workSchedule.hoursWorkedPerWeek" max="72" min="1">
                         </div>
                         <div class="input-label-box-horiz">
                             <label :for="`${kebabize('weeksWorkedPerYear')}`">{{ sentencize('weeksWorkedPerYear') }}</label>
-                            <input type="number" v-model="workSchedule.weeksWorkedPerYear"
-                                :defaultValue="workSchedule.weeksWorkedPerYear">
+                            <input type="number" v-model="workSchedule.weeksWorkedPerYear" :defaultValue="workSchedule.weeksWorkedPerYear" max="52" min="1">
                         </div>
                     </div>
                 </fieldset>
@@ -392,10 +402,10 @@ export default {
                 <h2>Data stack and staffing</h2>
                 <div class="input-label-box-horiz grid-child-span-3">
                     <label for="number-of-engineers-working-on-pipelines">Number of engineers working on pipelines</label>
-                    <input type="number" v-model="numberOfEngineersWorkingOnPipelines" required>
+                    <input type="number" v-model="numberOfEngineersWorkingOnPipelines" min="1" required>
                 </div>
                 <fieldset class="segmented-control" id="report-type-control">
-                    <div>Select a report type:</div>
+                    <div class="row-label">Select a report type:</div>
                     <div>
                         <input type="radio" id="saas" name="report-type" value="saas" v-model="reportType" checked />
                         <label for="saas">SaaS</label>
@@ -405,6 +415,7 @@ export default {
                         <label for="databases">Databases</label>
                     </div>
                 </fieldset>
+
                 <!-- Engineering function rows, render for both saas and databases -->
                 <div class="data-stack-staffing-field-group">
                     <div class="table-header three-column">
@@ -413,18 +424,18 @@ export default {
                         <span class="input-table-header text-right">Activities with Fivetran</span>
                     </div>
                     <fieldset class="data-stack-field-row" v-for="(value, key) in this.dataStackAndStaffing[this.reportType].engineeringFunction">
-                        <div>{{ sentencize(key) }}</div>
+                        <div class="row-label">{{ sentencize(key) }}</div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withoutFivetranLabel }}</i></label>
-                            <input type="number" :name="`${kebabize(key)}`" :id="`${kebabize(key)}`" v-model="value.withoutFivetran" :defaultValue="value.withoutFivetran">
+                            <input type="number" :name="`${kebabize(key)}`" :id="`${kebabize(key)}`" v-model="value.withoutFivetran" min="0">
                         </div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withFivetranLabel }}</i></label>
-                            <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran">
+                            <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran" min="0">
                         </div>
                     </fieldset>
                     <div class="data-stack-field-row border-top">
-                        <div>Total weekly pipeline maintenance time per engineer</div>
+                        <div class="row-label">Total weekly pipeline maintenance time per engineer</div>
                         <div class="output-wrapper">
                             <output>
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithoutFivetran }}</span>
@@ -446,14 +457,14 @@ export default {
                         <span class="input-table-header text-right">Costs with Fivetran</span>
                     </div>
                     <fieldset class="data-stack-field-row" v-for="(value, key) in this.dataStackAndStaffing[this.reportType].additionalComparisons">
-                        <div>{{ sentencize(key) }}</div>
+                        <div class="row-label">{{ sentencize(key) }}</div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withoutFivetranLabel }}</i></label>
-                            <input type="number" :for="`${kebabize(key)}`" :id="`${kebabize(key)}`" v-model="value.withoutFivetran" :defaultValue="value.withoutFivetran">
+                            <input type="number" :for="`${kebabize(key)}`" :id="`${kebabize(key)}`" v-model="value.withoutFivetran" :defaultValue="value.withoutFivetran" :step="key === 'dataUptime' ? .01 : 1000" min="0">
                         </div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withFivetranLabel }}</i></label>
-                            <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran">
+                            <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran" :step="key === 'dataUptime' ? .01 : 1000" min="0">
                         </div>
                     </fieldset>
                 </div>
@@ -464,7 +475,7 @@ export default {
                     <div class="input-row">
                         <div v-for="(value, key) in this.dataStackAndStaffing[this.reportType].additionalCostInputs" class="input-label-box-horiz">
                             <label :for="`${kebabize(key)}`">{{ sentencize(key) }}</label>
-                            <input type="number" :id="`${kebabize(key)}`" :name="`${kebabize(key)}`" v-model="this.dataStackAndStaffing[reportType].additionalCostInputs[key]">
+                            <input type="number" :id="`${kebabize(key)}`" :name="`${kebabize(key)}`" v-model="this.dataStackAndStaffing[reportType].additionalCostInputs[key]" min="0" step="1000">
                         </div>
                     </div>
                 </fieldset>
@@ -591,12 +602,16 @@ export default {
     --gray-40: #B0B2B8;
     --gray-90: #222222;
     --citron-10: #F4FFD3;
+    --blue-05: #EBF1FF;
     --blue-60: #306bea;
+    --blue-70: #2E60CF;
+    --apricot-10: #FFDBC0;
 }
 
 * {
     font-family: 'Inter', sans-serif;
     box-sizing: border-box;
+    color: var(--gray-90);
 }
 
 /* resets */
@@ -637,6 +652,7 @@ legend,
 h1 {
     font-size: 36px;
     line-height: 48px;
+    display: flex;
 }
 
 h2 {
@@ -747,7 +763,14 @@ output {
 }
 
 output {
-    background: var(--citron-10)
+    background: var(--blue-05);
+    border: 1px solid var(--blue-60);
+    color: var(--blue-70);
+    font-weight: 500;
+}
+
+output span {
+    color: var(--blue-70)
 }
 
 .output-denom-dollar::before {
@@ -972,6 +995,59 @@ main {
     font-weight: 800;
     text-decoration: none;
     font-style: normal;
+}
+
+.row-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    max-width: 1280px;
+    img {
+        height: 32px;
+    }
+    ul {
+        display: flex;
+        list-style: none;
+        font-size: 14px;
+        gap: 16px;
+    }
+}
+
+.top-nav {
+    display: flex;
+    justify-content: center;
+}
+
+.pill {
+    display: inline-flex;
+    padding: 4px 12px 4px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 100px;
+    align-self: center;
+    background: var(--apricot-10);
+    line-height: 20px;
+    margin-left: 12px;
+}
+
+a {
+    color: var(--gray-90);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: var(--blue-60)
 }
 
 </style>

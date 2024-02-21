@@ -1044,10 +1044,11 @@ a {
 
 a:hover {
     text-decoration: underline;
+    color: var(--blue-60);
 }
 
 a:visited {
-    color: var(--blue-60)
+    color: var(--gray-90);
 }
 
 </style>

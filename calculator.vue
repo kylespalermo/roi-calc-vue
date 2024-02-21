@@ -918,6 +918,7 @@ input[type=submit] {
 main {
     display: flex !important;
     row-gap: 60px;
+    padding-bottom: 60px;
     flex-direction: column;
     align-items: center;
 }
@@ -1021,7 +1022,7 @@ header {
     padding-top: 20px;
     padding-bottom: 20px;
     width: 100%;
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
     max-width: 1280px;
     img {

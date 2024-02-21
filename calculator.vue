@@ -170,7 +170,7 @@ export default {
     },
     computed: {
         equivalentHourlyRate() {
-            return Math.floor((this.currentStaffingCosts.averageSalary) / (this.workSchedule.weeksWorkedPerYear * this.workSchedule.hoursWorkedPerWeek));
+            return (this.currentStaffingCosts.averageSalary) / (this.workSchedule.weeksWorkedPerYear * this.workSchedule.hoursWorkedPerWeek);
         },
         calculateBuildMaintainCosts() {
             let calcs = {
@@ -291,31 +291,34 @@ export default {
             r.activitiesToBuildAndMaintainPipelines.annualCostOfMaintainingPipelines.fivetranCostSavings = this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.currentCosts - this.calculateBuildMaintainCosts.annualCostOfMaintainingPipelines.costsWithFivetran;
 
             //annual cost of pipeline related infrastructure
-            r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.currentCosts = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
-            r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran;
+            r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.currentCosts = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran;
+            r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
             r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.fivetranCostSavings = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran - this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
 
-            //databases only: cost of alternative
-            r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts = this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfAlternative;
-            r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran = 0;
-            r.activitiesToBuildAndMaintainPipelines.costOfAlternative.fivetranCostSavings = r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran;
+            if (this.reportType === "databases") {
+                //databases only: cost of alternative
+                r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts = this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfAlternative;
+                r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran = 0;
+                r.activitiesToBuildAndMaintainPipelines.costOfAlternative.fivetranCostSavings = r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran;
 
-            //databases only: cost of destination
-            r.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts = this.dataStackAndStaffing[this.reportType].additionalComparisons.costOfDestination.withoutFivetran;
-            r.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.costOfDestination.withFivetran;
-            r.activitiesToBuildAndMaintainPipelines.costOfDestination.fivetranCostSavings = r.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran;
+                //databases only: cost of destination
+                r.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts = this.dataStackAndStaffing[this.reportType].additionalComparisons.costOfDestination.withoutFivetran;
+                r.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.costOfDestination.withFivetran;
+                r.activitiesToBuildAndMaintainPipelines.costOfDestination.fivetranCostSavings = r.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran;
 
-            //databases only: cost of data downtime
-            const hrsPerYear = 24*365;
-            r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts = hrsPerYear * this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfDataDowntimePerHour * (1 - (this.dataStackAndStaffing[this.reportType].additionalComparisons.dataUptime.withoutFivetran * .01))
-            r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran = hrsPerYear * this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfDataDowntimePerHour * (1 - (this.dataStackAndStaffing[this.reportType].additionalComparisons.dataUptime.withFivetran * .01))
-            r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.fivetranCostSavings =  r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran;
+                //databases only: cost of data downtime
+                const hrsPerYear = 24*365;
+                r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts = hrsPerYear * this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfDataDowntimePerHour * (1 - (this.dataStackAndStaffing[this.reportType].additionalComparisons.dataUptime.withoutFivetran * .01))
+                r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran = hrsPerYear * this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfDataDowntimePerHour * (1 - (this.dataStackAndStaffing[this.reportType].additionalComparisons.dataUptime.withFivetran * .01))
+                r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.fivetranCostSavings =  r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts - r.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran;
+
+            }
 
             //costOfEnvironment
             const costs = Object.values(r.activitiesToBuildAndMaintainPipelines)
 
-            r.costOfEnvironment.currentCosts = costs.reduce((total, obj) => obj.currentCosts + total,0)
-            r.costOfEnvironment.costsWithFivetran = costs.reduce((total, obj) => obj.costsWithFivetran + total,0)
+            r.costOfEnvironment.currentCosts = Number(costs.reduce((total, obj) => obj.currentCosts + total,0))//having to coerce to number for some reason
+            r.costOfEnvironment.costsWithFivetran = Number(costs.reduce((total, obj) => obj.costsWithFivetran + total,0))//having to coerce to number for some reason
             //field below is just a calculation of the two above in same object, so I'm calculating using the reportOutputs values
             //this avoids calling reduce again, but differs from the structure in the other sum/subtract operations above in this function (generally last of three in each)
             //so maybe refactor those above
@@ -328,9 +331,12 @@ export default {
             //first value is just a copy of cost of environment, they're the same figure
             //see note above on structure/refactoring
             r.finalSavingsAnalysis.currentCosts = r.costOfEnvironment.currentCosts;
+
+            console.log(r.costOfEnvironment);
+            console.log(r.costOfFivetran)
             //second value subtracts cost of Fivetran from cost of environment
             r.finalSavingsAnalysis.costsWithFivetran = r.costOfEnvironment.costsWithFivetran + r.costOfFivetran;
-            r.finalSavingsAnalysis.fivetranCostSavings = r.costOfEnvironment.costsWithFivetran - r.costOfFivetran;
+            r.finalSavingsAnalysis.fivetranCostSavings = r.costOfEnvironment.fivetranCostSavings - r.costOfFivetran;
         }
     },
 }
@@ -379,7 +385,7 @@ export default {
                         </div>
                         <div class="input-label-box-horiz">
                             <label :for="`${kebabize('equivalentHourlyRate')}`">{{ sentencize('equivalentHourlyRate') }}</label>
-                            <output :for="`${kebabize('equivalentHourlyRate')}`" :value="equivalentHourlyRate"><span class="output-denom-dollar">{{ equivalentHourlyRate }}</span></output>
+                            <output :for="`${kebabize('equivalentHourlyRate')}`" :value="Math.round(equivalentHourlyRate)"><span class="output-denom-dollar">{{ Math.round(equivalentHourlyRate) }}</span></output>
                         </div>
                     </div>
                 </fieldset>
@@ -420,8 +426,8 @@ export default {
                 <div class="data-stack-staffing-field-group">
                     <div class="table-header three-column">
                         <span class="input-table-header text-left">Engineering function</span>
-                        <span class="input-table-header text-right">Activities without Fivetran</span>
-                        <span class="input-table-header text-right">Activities with Fivetran</span>
+                        <span class="input-table-header text-right">Activities without Fivetran (hours)</span>
+                        <span class="input-table-header text-right">Activities with Fivetran (hours)</span>
                     </div>
                     <fieldset class="data-stack-field-row" v-for="(value, key) in this.dataStackAndStaffing[this.reportType].engineeringFunction">
                         <div class="row-label">{{ sentencize(key) }}</div>
@@ -739,13 +745,15 @@ label,
 .input-row {
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
     justify-content: stretch;
 }
 
 .input-label-box-horiz {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    flex: 1 1 50%;
+    flex: 1 1 10%;
     background: var(--gray-10);
     align-items: center;
     padding: 12px;
@@ -755,11 +763,13 @@ label,
 
 .input-label-box-horiz input,
 output {
-    flex: 0 1 40%;
+    flex: 1 1 40%;
+    max-width: 100%;
 }
 
 .input-label-box-horiz label {
-    flex: 1 0 60%;
+    flex: 1 1 50%;
+    max-width: 100%;
 }
 
 output {
@@ -832,7 +842,7 @@ output span {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     gap: 16px;
-    align-items: baseline;
+    align-items: center;
     * {
         grid-column: auto / span 3;
     }
@@ -961,6 +971,10 @@ main {
     grid-column: auto / span 3;
 }
 
+.grid-child-span-4 {
+    grid-column: auto / span 4;
+}
+
 .controls > * {
     margin-bottom: 36px;
 }
@@ -983,7 +997,8 @@ main {
 
 .row-totals {
     border: none;
-    background: var(--citron-10);
+    background: var(--blue-05);
+    border: 1px solid var(--blue-60);
     margin-left: -20px;
     margin-right: -20px;
     padding: 20px;

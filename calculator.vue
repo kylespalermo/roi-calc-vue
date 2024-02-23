@@ -609,22 +609,22 @@ export default {
                         <div class="row-label">{{ sentencize(key) }}</div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withoutFivetranLabel }}</i></label>
-                            <input type="number" :name="`${kebabize(key)}`" :id="`${kebabize(key)}`" v-model="value.withoutFivetran" min="0">
+                            <input type="number" :name="`${kebabize(key)}`" :id="`${kebabize(key)}`" v-model="value.withoutFivetran" min="0" max="40">
                         </div>
                         <div class="input-label-caption">
                             <label :for="`${kebabize(key)}`"><i>{{ value.withFivetranLabel }}</i></label>
-                            <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran" min="0">
+                            <input type="number" v-model="value.withFivetran" :defaultValue="value.withFivetran" min="0" max="40">
                         </div>
                     </fieldset>
                     <div class="data-stack-field-row border-top">
                         <div class="row-label">Total weekly pipeline maintenance time per engineer</div>
                         <div class="output-wrapper">
-                            <div class="output">
+                            <div class="output" :class="totalWeeklyMaintainanceTimeWithoutFivetran > 40 ? 'error' : ''">
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithoutFivetran }}</span>
                             </div>
                         </div>
                         <div class="output-wrapper">
-                            <div class="output">
+                            <div class="output" :class="totalWeeklyMaintainanceTimeWithFivetran > 40 ? 'error' : ''">
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithFivetran }}</span>
                             </div>
                         </div>
@@ -680,7 +680,7 @@ export default {
                         <div class="row-label">{{ sentencize(key) }}</div>
                         <!-- v-for="(dataValue, dataKey) in value" -->
                         <input type="number" :name="`${kebabize(key) + '_' + 'currentEquivalentProd'}`" :id="`${kebabize(key) + '_' + 'currentEquivalentProd'}`" v-model="this.idcInputs[key].currentEquivalentProd" min="0">
-                        <input type="number" :name="`${kebabize(key) + '_' + 'salary'}`" :id="`${kebabize(key) + '_' + 'salary'}`" v-model="this.idcInputs[key].salary" min="0">
+                        <input type="number" :name="`${kebabize(key) + '_' + 'salary'}`" :id="`${kebabize(key) + '_' + 'salary'}`" v-model="this.idcInputs[key].salary" min="0" step="1000">
                         <input type="number" :name="`${kebabize(key) + '_' + 'idcGain'}`" :id="`${kebabize(key) + '_' + 'idcGain'}`" v-model="this.idcInputs[key].idcGain" min="0" disabled>
                         <div class="output">{{ formatDollars(this.computedIDCProductivityGains[key].afterFivetran) }}</div>
                         <input type="checkbox" :name="`${kebabize(key) + '_' + 'include'}`" :id="`${kebabize(key) + '_' + 'include'}`" v-model="this.idcInputs[key].include">
@@ -906,6 +906,8 @@ export default {
     --blue-60: #306bea;
     --blue-70: #2E60CF;
     --apricot-10: #FFDBC0;
+    --red-05: #FFE8E7;
+    --red-70: #D51A11;
 }
 
 * {
@@ -1163,7 +1165,7 @@ label,
         justify-content: flex-end;
 
         .output {
-            flex: 0 1 32%;
+            flex: 0 1 36%;
         }
     }
 }
@@ -1214,6 +1216,10 @@ label,
         font-weight: 400;
         text-align: right;
         flex: 0 0 60%;
+    }
+
+    input {
+        width: 100%;
     }
 }
 
@@ -1431,6 +1437,12 @@ a:visited {
     font-size: 16px;
     line-height: 20px;
     font-weight: 600;
+}
+
+.error, .error * {
+    color: var(--red-70) !important;
+    border-color: var(--red-70) !important;
+    background: var(--red-05) !important;
 }
 
 </style>

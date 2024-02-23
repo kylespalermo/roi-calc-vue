@@ -8,14 +8,14 @@ export default {
                 estimatedOnboardingTime: 'Estimated onboarding time (months)',
                 averageSalary: 'Average salary (USD)'
             },
-            complete: false, //toggle this to true to keep report visible for dev purposes
+            complete: true, //toggle this to true to keep report visible for dev purposes
             companyDetails: {
                 companyName: '',
                 prospectiveCustomerEmail: '',
                 fivetranContactEmail: '',
             },
             fivetranEngagementTimeline: {
-                fivetranContractPeriod: 12,
+                fivetranContractPeriod: 36,
                 estimatedOnboardingTime: 4,
             },
             currentStaffingCosts: {
@@ -116,6 +116,70 @@ export default {
                     }
                 }
             },
+            idcInputs: {
+                dataEngineers: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .48,
+                    include: false,
+                },
+                dataAnalytics: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .2,
+                    include: false,
+                },
+                dataGovernance: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .16,
+                    include: false,
+                },
+                finance: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .4,
+                    include: false,
+                },
+                productManagement: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .12,
+                    include: false,
+                },
+                salesAndCustomerSuccess: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .19,
+                    include: false,
+                },
+                logistics: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .29,
+                    include: false,
+                },
+                marketing: {
+                    currentEquivalentProd: 0,
+                    salary: 70000,
+                    idcGain: .16,
+                    include: false,
+                }
+            },
+            addtlIDCInputs: {
+                businessEnablement: {
+                    addtlGrossRevenue: 554894,
+                    margin: .15,
+                    annualNetGain: '',
+                    include: false,
+                },
+                operationalCostEfficiencies: {
+                    oneTimeCostSavings: 285714,
+                    annualCostSavings: 177400,
+                    averageAnnualSaving: '',
+                    include: false,
+                }
+            },
             reportOutputs: {
                 companyDetails: {
                     companyName: '',
@@ -160,11 +224,16 @@ export default {
                     fivetranCostSavings: ''
                 },
                 costOfFivetran: '',
-                finalSavingsAnalysis: {
+                fivetranSavingsAnalysis: {
                     currentCosts: '',
                     costsWithFivetran: '',
                     fivetranCostSavings: ''
-                }
+                },
+                idcProductivityGains: {},
+                totalIDCProductivityGains: {},
+                addtlIDCInputs: {},
+                totalOperationalEfficiencies: 0,
+                overallSavings: 0
             },
         }
     },
@@ -214,9 +283,75 @@ export default {
                 hrs += this.dataStackAndStaffing[this.reportType].engineeringFunction[category].withoutFivetran;
             }
             return hrs;
+        },
+        computedIDCProductivityGains(){
+            let calcs = {
+                dataEngineers: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                dataAnalytics: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                dataGovernance: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                finance: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                productManagement: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                salesAndCustomerSuccess: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                logistics: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                },
+                marketing: {
+                    beforeFivetran: '',
+                    afterFivetran: '',
+                    averageAnnualGain: '',
+                }  
+            }
+
+            for (let calc in calcs) {
+                let idcGains = this.calculateIDCGains(this.idcInputs[calc].currentEquivalentProd, this.idcInputs[calc].salary, this.idcInputs[calc].idcGain)
+                calcs[calc].beforeFivetran = idcGains[0]
+                calcs[calc].afterFivetran = idcGains[1]
+                calcs[calc].averageAnnualGain = idcGains[2]
+            }
+            return calcs;
+        },
+        computedBusinessEnablementAnnualNetGain(){
+            return this.addtlIDCInputs.businessEnablement.addtlGrossRevenue * this.addtlIDCInputs.businessEnablement.margin; 
+        },
+        computedOperationalCostEfficiencies(){
+            //one time cost savings + (annual cost savings * Fivetran contract period) / Fivetran contract period
+            return (this.addtlIDCInputs.operationalCostEfficiencies.oneTimeCostSavings + this.addtlIDCInputs.operationalCostEfficiencies.annualCostSavings * (this.fivetranEngagementTimeline.fivetranContractPeriod / 12)) / (this.fivetranEngagementTimeline.fivetranContractPeriod / 12)
         }
+
     },
     methods: {
+        calculateIDCGains(ftes, salary, percentGain){
+            let beforeFivetran = salary * ftes;
+            let afterFivetran = (beforeFivetran * percentGain) + beforeFivetran
+            let averageAnnualGain = afterFivetran - beforeFivetran;
+            return [beforeFivetran, afterFivetran, averageAnnualGain]
+        },
         formatDollars(num) {
             const numOptions = { style: 'currency', currency: 'USD' };
             const numberFormat = new Intl.NumberFormat('en-US', numOptions);
@@ -330,13 +465,51 @@ export default {
             //final savings analysis
             //first value is just a copy of cost of environment, they're the same figure
             //see note above on structure/refactoring
-            r.finalSavingsAnalysis.currentCosts = r.costOfEnvironment.currentCosts;
+            r.fivetranSavingsAnalysis.currentCosts = r.costOfEnvironment.currentCosts;
 
-            console.log(r.costOfEnvironment);
-            console.log(r.costOfFivetran)
             //second value subtracts cost of Fivetran from cost of environment
-            r.finalSavingsAnalysis.costsWithFivetran = r.costOfEnvironment.costsWithFivetran + r.costOfFivetran;
-            r.finalSavingsAnalysis.fivetranCostSavings = r.costOfEnvironment.fivetranCostSavings - r.costOfFivetran;
+            r.fivetranSavingsAnalysis.costsWithFivetran = r.costOfEnvironment.costsWithFivetran + r.costOfFivetran;
+            r.fivetranSavingsAnalysis.fivetranCostSavings = r.costOfEnvironment.fivetranCostSavings - r.costOfFivetran;
+
+            for (let key in this.idcInputs) {
+                if (this.idcInputs[key].include) {
+                    r.idcProductivityGains[key] = this.computedIDCProductivityGains[key];
+                } else {
+                    delete r.idcProductivityGains[key]
+                }
+            }
+
+            const IDCRows = Object.values(r.idcProductivityGains)
+            r.totalIDCProductivityGains.beforeFivetran = Number(IDCRows.reduce((total, obj) => obj.beforeFivetran + total,0))
+            r.totalIDCProductivityGains.afterFivetran = Number(IDCRows.reduce((total, obj) => obj.afterFivetran + total,0))
+            r.totalIDCProductivityGains.averageAnnualGain = Number(IDCRows.reduce((total, obj) => obj.averageAnnualGain + total,0))
+
+            if (this.addtlIDCInputs.businessEnablement.include) {
+                r.addtlIDCInputs.businessEnablementNetGain = this.computedBusinessEnablementAnnualNetGain;
+                // r.totalOperationalEfficiencies += this.computedBusinessEnablementAnnualNetGain;
+            } else {
+                delete r.addtlIDCInputs.businessEnablementNetGain;
+                // r.totalOperationalEfficiencies -= this.computedBusinessEnablementAnnualNetGain;
+                // console.log("minus!")
+            }
+
+            if (this.addtlIDCInputs.operationalCostEfficiencies.include) {
+                r.addtlIDCInputs.operationalCostEfficiencies = this.computedOperationalCostEfficiencies;
+                // r.totalOperationalEfficiencies += this.computedOperationalCostEfficiencies;
+            } else {
+                delete r.addtlIDCInputs.operationalCostEfficiencies;
+                // r.totalOperationalEfficiencies -= this.computedOperationalCostEfficiencies;
+                // console.log("minus!")
+            }
+
+            r.totalOperationalEfficiencies = 0;
+            for (let key in r.addtlIDCInputs) {
+                console.log(r.addtlIDCInputs[key])
+                r.totalOperationalEfficiencies += r.addtlIDCInputs[key]
+            }
+
+            r.overallSavings = r.totalOperationalEfficiencies + r.totalIDCProductivityGains.averageAnnualGain + r.fivetranSavingsAnalysis.fivetranCostSavings;
+
         }
     },
 }
@@ -372,7 +545,7 @@ export default {
                     <div class="input-row">
                         <div class="input-label-box-horiz" v-for="(value, key, index) in this.fivetranEngagementTimeline">
                             <label :for="`${kebabize(key)}`">{{ this.labels[key] }}</label>
-                            <input type="number" v-model="fivetranEngagementTimeline[key]" :defaultValue="value" :step="key === 'fivetranContractPeriod' ? 12 : 1"  :min="key === 'fivetranContractPeriod' ? 12 : 0">
+                            <input type="number" v-model="this.fivetranEngagementTimeline[key]" :defaultValue="value" :step="key === 'fivetranContractPeriod' ? 12 : 1"  :min="key === 'fivetranContractPeriod' ? 12 : 0">
                         </div>
                     </div>
                 </fieldset>
@@ -385,7 +558,7 @@ export default {
                         </div>
                         <div class="input-label-box-horiz">
                             <label :for="`${kebabize('equivalentHourlyRate')}`">{{ sentencize('equivalentHourlyRate') }}</label>
-                            <output :for="`${kebabize('equivalentHourlyRate')}`" :value="Math.round(equivalentHourlyRate)"><span class="output-denom-dollar">{{ Math.round(equivalentHourlyRate) }}</span></output>
+                            <div class="output">{{ formatDollars(equivalentHourlyRate) }}</div>
                         </div>
                     </div>
                 </fieldset>
@@ -403,8 +576,9 @@ export default {
                     </div>
                 </fieldset>
             </div>
+            
+            <!-- Beging data stack and staffing section -->
             <div class="form-block controls" id="data-staff-activities">
-                <!-- Beging data stack and staffing section -->
                 <h2>Data stack and staffing</h2>
                 <div class="input-label-box-horiz grid-child-span-3">
                     <label for="number-of-engineers-working-on-pipelines">Number of engineers working on pipelines</label>
@@ -443,14 +617,14 @@ export default {
                     <div class="data-stack-field-row border-top">
                         <div class="row-label">Total weekly pipeline maintenance time per engineer</div>
                         <div class="output-wrapper">
-                            <output>
+                            <div class="output">
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithoutFivetran }}</span>
-                            </output>
+                            </div>
                         </div>
                         <div class="output-wrapper">
-                            <output>
+                            <div class="output">
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithFivetran }}</span>
-                            </output>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -486,9 +660,65 @@ export default {
                     </div>
                 </fieldset>
             </div>
+            
+            <!-- IDC Report Inputs -->
+            <div class="form-block controls" id="data-staff-activities">
+                <h2>Line of business impact of Fivetran</h2>
+                <div class="idc-inputs-field-group">
+                    <div class="table-header idc-section-grid">
+                        <span class="input-table-header text-left">Productivity gains by function</span>
+                        <span class="input-table-header text-right">Equivalent productivity level (FTEs)</span>
+                        <span class="input-table-header text-right">Salary</span>
+                        <span class="input-table-header text-right">IDC-calculated productivity gain</span>
+                        <span class="input-table-header text-right">Average Annual Gain</span>
+                        <span class="input-table-header text-center">Include?</span>
+                    </div>
+                    <fieldset>
+                    <div class="idc-field-row" v-for="(value, key) in this.idcInputs">
+                        <div class="row-label">{{ sentencize(key) }}</div>
+                        <!-- v-for="(dataValue, dataKey) in value" -->
+                        <input type="number" :name="`${kebabize(key) + '_' + 'currentEquivalentProd'}`" :id="`${kebabize(key) + '_' + 'currentEquivalentProd'}`" v-model="this.idcInputs[key].currentEquivalentProd" min="0">
+                        <input type="number" :name="`${kebabize(key) + '_' + 'salary'}`" :id="`${kebabize(key) + '_' + 'salary'}`" v-model="this.idcInputs[key].salary" min="0">
+                        <input type="number" :name="`${kebabize(key) + '_' + 'idcGain'}`" :id="`${kebabize(key) + '_' + 'idcGain'}`" v-model="this.idcInputs[key].idcGain" min="0" disabled>
+                        <div class="output">{{ formatDollars(this.computedIDCProductivityGains[key].afterFivetran) }}</div>
+                        <input type="checkbox" :name="`${kebabize(key) + '_' + 'include'}`" :id="`${kebabize(key) + '_' + 'include'}`"  v-model="this.idcInputs[key].include">
+                    </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <!-- Additional idc inputs section  -->
+            <div class="form-block controls" id="data-staff-activities">
+                <h2>Additional gains (per IDC)</h2>
+                <div class="idc-inputs-field-group">
+                    <div class="table-header idc-section-two-grid">
+                        <span class="input-table-header text-left">&nbsp</span>
+                        <span class="input-table-header text-right">Additional gross revenue</span>
+                        <span class="input-table-header text-right">Margin</span>
+                        <span class="input-table-header text-right">Annual net gain</span>
+                        <span class="input-table-header text-center">Include?</span>
+                    </div>
+                    <fieldset>
+                        <div class="idc-field-row idc-section-two-field-row">
+                            <div class="row-label">Business enablement — higher gross revenue</div>
+                            <input type="number" name="addtl-gross-revenue" id="addtl-gross-revenue" v-model="this.addtlIDCInputs.businessEnablement.addtlGrossRevenue" min="0">
+                            <input type="number" name="margin" id="margin" v-model="this.addtlIDCInputs.businessEnablement.margin" min="0" step=".01">
+                            <div class="output">{{ formatDollars(computedBusinessEnablementAnnualNetGain) }}</div>
+                            <input type="checkbox" name="business-enablement-include" id="business-enablement-include" v-model="this.addtlIDCInputs.businessEnablement.include">
+                        </div>
+                        <div class="idc-field-row idc-section-two-field-row">
+                            <div class="row-label">Operational cost efficiencies</div>
+                            <input type="number" name="operational-cost-efficiencies" id="operational-cost-efficiencies" v-model="this.addtlIDCInputs.operationalCostEfficiencies.oneTimeCostSavings" min="0">
+                            <input type="number" name="annual-cost-savings" id="annual-cost-savings" v-model="this.addtlIDCInputs.operationalCostEfficiencies.annualCostSavings" min="0">
+                            <div class="output">{{ formatDollars(computedOperationalCostEfficiencies) }}</div>
+                            <input type="checkbox" name="business-enablement-include" id="business-enablement-include" v-model="this.addtlIDCInputs.operationalCostEfficiencies.include">
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
 
             <!-- Generate report button -->
-            <input type="submit" value="Generate report" id="generate-report" @click="submitForm">
+            <input type="submit" :value="this.complete === false ? 'Generate report' : 'Update Report'" id="generate-report" @click="submitForm">
 
         </form>
         
@@ -590,13 +820,75 @@ export default {
 
                 <!-- Totals row -->
                 <div class="table-row four-column row-totals">
-                    <span class="input-table-header text-left">Final savings analysis</span>
-                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.finalSavingsAnalysis.currentCosts) }}<span class="annotation"><br>Total existing costs</span></span>
-                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.finalSavingsAnalysis.costsWithFivetran) }}<span class="annotation"><br>Total costs with Fivetran</span></span>
-                    <span class="input-table-header text-center"><em>{{ this.formatDollars(this.reportOutputs.finalSavingsAnalysis.fivetranCostSavings) }}</em><br><span class="annotation">Annual savings realized with Fivetran</span></span>
+                    <span class="input-table-header text-left">Initial savings after deployment of Fivetran</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.fivetranSavingsAnalysis.currentCosts) }}<span class="annotation"><br>Total existing costs</span></span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.fivetranSavingsAnalysis.costsWithFivetran) }}<span class="annotation"><br>Total costs with Fivetran</span></span>
+                    <span class="input-table-header text-center"><em>{{ this.formatDollars(this.reportOutputs.fivetranSavingsAnalysis.fivetranCostSavings) }}</em><br><span class="annotation">Annual savings realized with Fivetran</span></span>
                 </div>
 
             </section>
+            <!-- idc section one -->
+            <section v-if="Object.keys(this.reportOutputs.idcProductivityGains).length">
+                <!-- beforeFivetran, afterFivetran, averageAnnualGain -->
+                <div class="table-header four-column">
+                    <span class="input-table-header text-left">Productivity gains realized by re-deploying time saved (per IDC)</span>
+                    <span class="input-table-header text-center">Before Fivetran equivalent productivity level (FTEs)</span>
+                    <span class="input-table-header text-center">After Fivetran equivalent productivity level (FTEs)</span>
+                    <span class="input-table-header text-center">Productivity gains after Fivetran<span class="annotation"><br>(Current costs less costs w/Fivetran)</span></span>
+                </div>
+                
+                <!-- the rows of data -->
+                <div v-for="(value, key, index) in this.reportOutputs.idcProductivityGains" class="table-row four-column">
+                    <span class="input-table-header text-left">{{ sentencize(key) }}</span>
+                    <span class="input-table-header text-center">{{ formatDollars(value.beforeFivetran) }}</span>
+                    <span class="input-table-header text-center">{{ formatDollars(value.afterFivetran) }}</span>
+                    <span class="input-table-header text-center">{{ formatDollars(value.averageAnnualGain) }}</span>
+                </div>
+
+                <!-- Totals row -->
+                <div class="table-row four-column row-totals">
+                    <span class="input-table-header text-left">Total producivity gains</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.beforeFivetran) }}</span>
+                    <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.afterFivetran) }}</span>
+                    <span class="input-table-header text-center"><em>{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.averageAnnualGain) }}</em></span>
+                </div>
+            </section>
+
+            <section v-if="Object.keys(this.reportOutputs.addtlIDCInputs).length">
+                <div class="table-header four-column">
+                    <span class="input-table-header text-left">Other operational efficiencies (per IDC)</span>
+                    <span class="input-table-header text-center table-last-column">Average annual gain</span>
+                </div>
+                <div v-if="this.reportOutputs.addtlIDCInputs.businessEnablementNetGain" class="table-row four-column">
+                    <span class="input-table-header text-left">Business enablement — higher gross revenue</span>
+                    <span class="input-table-header text-center table-last-column">{{ formatDollars(this.reportOutputs.addtlIDCInputs.businessEnablementNetGain) }}</span>
+                </div>
+                <div v-if="this.reportOutputs.addtlIDCInputs.operationalCostEfficiencies" class="table-row four-column">
+                    <span class="input-table-header text-left">Operational cost efficiencies</span>
+                    <span class="input-table-header text-center table-last-column">{{ formatDollars(this.reportOutputs.addtlIDCInputs.operationalCostEfficiencies) }}</span>
+                </div>
+                <div class="table-row four-column row-totals">
+                    <span class="input-table-header text-left">Total additional operational efficiencies</span>
+                    <span class="input-table-header text-center table-last-column"><em>{{ this.formatDollars(this.reportOutputs.totalOperationalEfficiencies) }}</em></span>
+                </div>
+            </section>
+
+            <section v-if="Object.keys(this.reportOutputs.idcProductivityGains).length || Object.keys(this.reportOutputs.addtlIDCInputs).length">
+                <div class="table-row four-column row-totals  final-total">
+                    <span class="input-table-header text-left">Overall savings after deploying Fivetran</span>
+                    <span class="input-table-header text-center table-last-column"><em>{{ this.formatDollars(this.reportOutputs.overallSavings) }}</em></span>
+                </div>
+            </section>
+
+
+                <!-- just need to write the logic to push the addtl idc inputs to reportOutputs -->
+                <!-- only push the total to the object if iincluded -->
+                <!-- check object lenght as other idc section above -->
+                <!-- then v-if for both of those rows, no v-for -->
+                <!-- then its own sub-totals row -->
+
+                <!-- then, v-if either of the sections above are complete, the major totals row -->
+                
         </div>
     </main>
 </template>
@@ -714,7 +1006,7 @@ legend {
 
 
 input,
-output {
+.output {
     padding: 6px 2px 6px 12px;
     font-size: 14px;
     line-height: 20px;
@@ -762,7 +1054,7 @@ label,
 }
 
 .input-label-box-horiz input,
-output {
+.output {
     flex: 1 1 40%;
     max-width: 100%;
 }
@@ -772,14 +1064,14 @@ output {
     max-width: 100%;
 }
 
-output {
+.output {
     background: var(--blue-05);
     border: 1px solid var(--blue-60);
     color: var(--blue-70);
     font-weight: 500;
 }
 
-output span {
+.output span {
     color: var(--blue-70)
 }
 
@@ -805,10 +1097,21 @@ output span {
     display: flex;
     flex-direction: column;
     gap: 16px;
-
     legend {
         padding: 0px;
         border: none;
+    }
+}
+
+.idc-inputs-field-group {
+    grid-column: 1 / span 12;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    fieldset {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
     }
 }
 
@@ -818,6 +1121,10 @@ output span {
 
 .three-column {
     grid-template-columns: repeat(3, 1fr);
+}
+
+.idc-section-grid {
+    grid-template-columns: 3fr 2fr 2fr 2fr 2fr 1fr;
 }
 
 .table-header,
@@ -831,6 +1138,7 @@ output span {
 
 .table-header {
     border-color: var(--gray-90);
+    align-items: flex-end;
 }
 
 .table-row {
@@ -852,10 +1160,39 @@ output span {
         align-items: center;
         justify-content: flex-end;
 
-        output {
+        .output {
             flex: 0 1 32%;
         }
     }
+}
+
+.idc-field-row {
+    display: grid;
+    grid-template-columns: 3fr 2fr 2fr 2fr 2fr 1fr;
+    gap: 16px;
+    align-items: center;
+    justify-items: stretch;
+    * {
+        grid-column: auto / span 1;
+    }
+
+    .output-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        .output {
+            flex: 0 1 32%;
+        }
+    }
+}
+
+.idc-section-two-field-row {
+    grid-template-columns: 3fr 2fr 2fr 2fr 1fr;
+}
+
+
+.idc-field-row .row-label {
+    justify-self: start;
 }
 
 .data-staff-function-outputs {
@@ -1008,7 +1345,7 @@ main {
 }
 
 .row-totals em {
-    font-weight: 800;
+    font-weight: 700;
     text-decoration: none;
     font-style: normal;
 }
@@ -1065,6 +1402,33 @@ a:hover {
 
 a:visited {
     color: var(--gray-90);
+}
+
+.idc-field-row input, .idc-field-row .output {
+    margin-left: 20px;
+}
+
+.idc-field-row input[type=checkbox] {
+    margin-left: 0px;
+}
+
+.idc-section-two-grid {
+    grid-template-columns: 3fr 2fr 2fr 2fr 1fr;
+}
+
+.table-last-column {
+    grid-column: 4 / span 1;
+}
+
+.final-total {
+    background: var(--blue-60);
+}
+
+.final-total * {
+    color: white !important;
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 600;
 }
 
 </style>

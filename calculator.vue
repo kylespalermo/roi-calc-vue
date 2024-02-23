@@ -8,7 +8,7 @@ export default {
                 estimatedOnboardingTime: 'Estimated onboarding time (months)',
                 averageSalary: 'Average salary (USD)'
             },
-            complete: true, //toggle this to true to keep report visible for dev purposes
+            complete: false, //toggle this to true to keep report visible for dev purposes
             companyDetails: {
                 companyName: '',
                 prospectiveCustomerEmail: '',

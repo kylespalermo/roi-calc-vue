@@ -120,56 +120,56 @@ export default {
                 dataEngineers: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .48,
+                    idcGain: 48,
                     include: false,
                 },
                 dataAnalytics: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .2,
+                    idcGain: 2,
                     include: false,
                 },
                 dataGovernance: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .16,
+                    idcGain: 16,
                     include: false,
                 },
                 finance: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .4,
+                    idcGain: 4,
                     include: false,
                 },
                 productManagement: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .12,
+                    idcGain: 12,
                     include: false,
                 },
                 salesAndCustomerSuccess: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .19,
+                    idcGain: 19,
                     include: false,
                 },
                 logistics: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .29,
+                    idcGain: 29,
                     include: false,
                 },
                 marketing: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: .16,
+                    idcGain: 16,
                     include: false,
                 }
             },
             addtlIDCInputs: {
                 businessEnablement: {
                     addtlGrossRevenue: 554894,
-                    margin: .15,
+                    margin: 15,//mirror this approach for above
                     annualNetGain: '',
                     include: false,
                 },
@@ -329,7 +329,7 @@ export default {
             }
 
             for (let calc in calcs) {
-                let idcGains = this.calculateIDCGains(this.idcInputs[calc].currentEquivalentProd, this.idcInputs[calc].salary, this.idcInputs[calc].idcGain)
+                let idcGains = this.calculateIDCGains(this.idcInputs[calc].currentEquivalentProd, this.idcInputs[calc].salary, this.convertIntToPercent(this.idcInputs[calc].idcGain))
                 calcs[calc].beforeFivetran = idcGains[0]
                 calcs[calc].afterFivetran = idcGains[1]
                 calcs[calc].averageAnnualGain = idcGains[2]
@@ -337,15 +337,17 @@ export default {
             return calcs;
         },
         computedBusinessEnablementAnnualNetGain(){
-            return this.addtlIDCInputs.businessEnablement.addtlGrossRevenue * this.addtlIDCInputs.businessEnablement.margin; 
+            return this.addtlIDCInputs.businessEnablement.addtlGrossRevenue * this.convertIntToPercent(this.addtlIDCInputs.businessEnablement.margin) 
         },
         computedOperationalCostEfficiencies(){
             //one time cost savings + (annual cost savings * Fivetran contract period) / Fivetran contract period
             return (this.addtlIDCInputs.operationalCostEfficiencies.oneTimeCostSavings + this.addtlIDCInputs.operationalCostEfficiencies.annualCostSavings * (this.fivetranEngagementTimeline.fivetranContractPeriod / 12)) / (this.fivetranEngagementTimeline.fivetranContractPeriod / 12)
-        }
-
+        },
     },
     methods: {
+        convertIntToPercent(int) {
+            return int * .01;
+        },
         calculateIDCGains(ftes, salary, percentGain){
             let beforeFivetran = salary * ftes;
             let afterFivetran = (beforeFivetran * percentGain) + beforeFivetran
@@ -669,7 +671,7 @@ export default {
                         <span class="input-table-header text-left">Productivity gains by function</span>
                         <span class="input-table-header text-right">Equivalent productivity level (FTEs)</span>
                         <span class="input-table-header text-right">Salary</span>
-                        <span class="input-table-header text-right">IDC-calculated productivity gain</span>
+                        <span class="input-table-header text-right">IDC-calculated productivity gain (percent)</span>
                         <span class="input-table-header text-right">Average Annual Gain</span>
                         <span class="input-table-header text-center">Include?</span>
                     </div>
@@ -681,7 +683,7 @@ export default {
                         <input type="number" :name="`${kebabize(key) + '_' + 'salary'}`" :id="`${kebabize(key) + '_' + 'salary'}`" v-model="this.idcInputs[key].salary" min="0">
                         <input type="number" :name="`${kebabize(key) + '_' + 'idcGain'}`" :id="`${kebabize(key) + '_' + 'idcGain'}`" v-model="this.idcInputs[key].idcGain" min="0" disabled>
                         <div class="output">{{ formatDollars(this.computedIDCProductivityGains[key].afterFivetran) }}</div>
-                        <input type="checkbox" :name="`${kebabize(key) + '_' + 'include'}`" :id="`${kebabize(key) + '_' + 'include'}`"  v-model="this.idcInputs[key].include">
+                        <input type="checkbox" :name="`${kebabize(key) + '_' + 'include'}`" :id="`${kebabize(key) + '_' + 'include'}`" v-model="this.idcInputs[key].include">
                     </div>
                     </fieldset>
                 </div>
@@ -694,7 +696,7 @@ export default {
                     <div class="table-header idc-section-two-grid">
                         <span class="input-table-header text-left">&nbsp</span>
                         <span class="input-table-header text-right">Additional gross revenue</span>
-                        <span class="input-table-header text-right">Margin</span>
+                        <span class="input-table-header text-right">Margin (percent)</span>
                         <span class="input-table-header text-right">Annual net gain</span>
                         <span class="input-table-header text-center">Include?</span>
                     </div>
@@ -702,7 +704,7 @@ export default {
                         <div class="idc-field-row idc-section-two-field-row">
                             <div class="row-label">Business enablement — higher gross revenue</div>
                             <input type="number" name="addtl-gross-revenue" id="addtl-gross-revenue" v-model="this.addtlIDCInputs.businessEnablement.addtlGrossRevenue" min="0">
-                            <input type="number" name="margin" id="margin" v-model="this.addtlIDCInputs.businessEnablement.margin" min="0" step=".01">
+                            <input type="number" name="margin" id="margin" v-model="this.addtlIDCInputs.businessEnablement.margin" min="0">
                             <div class="output">{{ formatDollars(computedBusinessEnablementAnnualNetGain) }}</div>
                             <input type="checkbox" name="business-enablement-include" id="business-enablement-include" v-model="this.addtlIDCInputs.businessEnablement.include">
                         </div>

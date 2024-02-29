@@ -1504,4 +1504,6 @@ input[type="radio"] {
 
 label { font-weight: 600 !important; }
 
+label i { font-weight: 400 !important; }
+
 </style>

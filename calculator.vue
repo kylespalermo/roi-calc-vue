@@ -1121,6 +1121,7 @@ label,
     font-size: 14px;
     line-height: 20px;
     border-radius: 2px;
+    margin-bottom: 0px !important;
 }
 
 .segmented-control-button:hover {

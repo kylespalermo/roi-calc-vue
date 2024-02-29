@@ -713,7 +713,7 @@ export default {
                         <span class="input-table-header text-left">&nbsp</span>
                         <span class="input-table-header text-right">One-time cost savings</span>
                         <span class="input-table-header text-right">Annual cost savings</span>
-                        <span class="input-table-header text-right">Avgerage annual saving</span>
+                        <span class="input-table-header text-right">Average annual saving</span>
                         <span class="input-table-header text-center">Include?</span>
                     </div>
                     <fieldset>
@@ -858,7 +858,7 @@ export default {
 
                 <!-- Totals row -->
                 <div class="table-row four-column row-totals">
-                    <span class="input-table-header text-left">Total producivity gains</span>
+                    <span class="input-table-header text-left">Total productivity gains</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.beforeFivetran) }}</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.afterFivetran) }}</span>
                     <span class="input-table-header text-center"><em>{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.averageAnnualGain) }}</em></span>
@@ -1138,10 +1138,11 @@ label,
     display: flex;
     flex-direction: column;
     gap: 16px;
-    legend {
-        padding: 0px;
-        border: none;
-    }
+}
+
+.data-stack-staffing-field-group legend {
+    padding: 0px;
+    border: none;
 }
 
 .idc-inputs-field-group {
@@ -1149,11 +1150,13 @@ label,
     display: flex;
     flex-direction: column;
     gap: 16px;
-    fieldset {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+}
+
+
+.idc-inputs-field-group fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .four-column {
@@ -1499,6 +1502,6 @@ input[type="radio"] {
 
 .grid-child-span-10 { grid-column: 1 / span 10}
 
-
+label { font-weight: 600 !important; }
 
 </style>

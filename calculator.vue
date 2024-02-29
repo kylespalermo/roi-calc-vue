@@ -1445,4 +1445,18 @@ a:visited {
     background: var(--red-05) !important;
 }
 
+@media print {
+    form {
+        display: none;
+    }
+
+    .top-nav {
+        display: none;
+    }
+
+    .form-block-report {
+        border: none;
+    }
+}
+
 </style>

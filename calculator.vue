@@ -520,7 +520,7 @@ export default {
 <template>
     <div class="top-nav">
         <header>
-            <img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg" alt="Fivetran logo" href="https://www.fivetran.com/">
+            <a  href="https://www.fivetran.com/"><img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg" alt="Fivetran logo"></a>
             <nav>
                 <ul>
                     <li><a href="https://fivetran.com/docs/getting-started">Docs</a></li>
@@ -532,13 +532,13 @@ export default {
     </div>
     <main>
         <form onsubmit="return false">
-            <h1>Fivetran ROI Calculator<span class="pill">Beta</span></h1>
+            <h1>ROI Calculator<span class="pill">Beta</span></h1>
             <div class="form-block controls" id="company-profile">
                 <h2>Company profile</h2>
                 <fieldset>
                     <legend>Contact information</legend>
                     <div class="input-label-vertical" v-for="(value, key, index) in this.companyDetails">
-                        <label :for="`${kebabize(key)}`">{{ sentencize(key) }}</label>
+                        <label :for="`${kebabize(key)}`">{{ sentencize(key) }} <sup>*</sup></label>
                         <input v-model="companyDetails[key]" :id="`${kebabize(key)}`" type="text" required>
                     </div>
                 </fieldset>
@@ -583,18 +583,16 @@ export default {
             <div class="form-block controls" id="data-staff-activities">
                 <h2>Data stack and staffing</h2>
                 <div class="input-label-box-horiz grid-child-span-3">
-                    <label for="number-of-engineers-working-on-pipelines">Number of engineers working on pipelines</label>
+                    <label for="number-of-engineers-working-on-pipelines">Number of engineers working on pipelines <sup>*</sup></label>
                     <input type="number" v-model="numberOfEngineersWorkingOnPipelines" min="1" required>
                 </div>
-                <fieldset class="segmented-control" id="report-type-control">
+                <fieldset class="segmented-control-wrapper" id="report-type-control">
                     <div class="row-label">Select a report type:</div>
-                    <div>
+                    <div class="segmented-control">
                         <input type="radio" id="saas" name="report-type" value="saas" v-model="reportType" checked />
-                        <label for="saas">SaaS</label>
-                    </div>
-                    <div>
+                        <label class="segmented-control-button" for="saas" :class="this.reportType === 'saas' ? 'active' : ''">SaaS connectors</label>
                         <input type="radio" id="databases" name="report-type" value="databases" v-model="reportType" />
-                        <label for="databases">Databases</label>
+                        <label class="segmented-control-button" for="databases" :class="this.reportType === 'databases' ? 'active' : ''">Database connectors</label>
                     </div>
                 </fieldset>
 
@@ -619,12 +617,12 @@ export default {
                     <div class="data-stack-field-row border-top">
                         <div class="row-label">Total weekly pipeline maintenance time per engineer</div>
                         <div class="output-wrapper">
-                            <div class="output" :class="totalWeeklyMaintainanceTimeWithoutFivetran > 40 ? 'error' : ''">
+                            <div class="output" :class="totalWeeklyMaintainanceTimeWithoutFivetran > this.workSchedule.hoursWorkedPerWeek ? 'error' : ''">
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithoutFivetran }}</span>
                             </div>
                         </div>
                         <div class="output-wrapper">
-                            <div class="output" :class="totalWeeklyMaintainanceTimeWithFivetran > 40 ? 'error' : ''">
+                            <div class="output" :class="totalWeeklyMaintainanceTimeWithFivetran > this.workSchedule.hoursWorkedPerWeek ? 'error' : ''">
                                 <span class="denom-hours">{{ totalWeeklyMaintainanceTimeWithFivetran }}</span>
                             </div>
                         </div>
@@ -664,8 +662,8 @@ export default {
             </div>
             
             <!-- IDC Report Inputs -->
-            <div class="form-block controls" id="data-staff-activities">
-                <h2>Line of business impact of Fivetran</h2>
+            <div class="form-block controls">
+                <h2>Line of business impact of Fivetran (per IDC)</h2>
                 <div class="idc-inputs-field-group">
                     <div class="table-header idc-section-grid">
                         <span class="input-table-header text-left">Productivity gains by function</span>
@@ -690,9 +688,9 @@ export default {
             </div>
 
             <!-- Additional idc inputs section  -->
-            <div class="form-block controls" id="data-staff-activities">
+            <div class="form-block controls">
                 <h2>Additional gains (per IDC)</h2>
-                <div class="idc-inputs-field-group">
+                <div class="idc-inputs-field-group grid-child-span-10">
                     <div class="table-header idc-section-two-grid">
                         <span class="input-table-header text-left">&nbsp</span>
                         <span class="input-table-header text-right">Additional gross revenue</span>
@@ -708,6 +706,17 @@ export default {
                             <div class="output">{{ formatDollars(computedBusinessEnablementAnnualNetGain) }}</div>
                             <input type="checkbox" name="business-enablement-include" id="business-enablement-include" v-model="this.addtlIDCInputs.businessEnablement.include">
                         </div>
+                    </fieldset>
+                 </div>
+                <div class="idc-inputs-field-group grid-child-span-10">
+                    <div class="table-header idc-section-two-grid">
+                        <span class="input-table-header text-left">&nbsp</span>
+                        <span class="input-table-header text-right">One-time cost savings</span>
+                        <span class="input-table-header text-right">Annual cost savings</span>
+                        <span class="input-table-header text-right">Average annual saving</span>
+                        <span class="input-table-header text-center">Include?</span>
+                    </div>
+                    <fieldset>
                         <div class="idc-field-row idc-section-two-field-row">
                             <div class="row-label">Operational cost efficiencies</div>
                             <input type="number" name="operational-cost-efficiencies" id="operational-cost-efficiencies" v-model="this.addtlIDCInputs.operationalCostEfficiencies.oneTimeCostSavings" min="0">
@@ -749,7 +758,7 @@ export default {
                     <span class="input-table-header text-left">Activities to build & maintain pipelines</span>
                     <span class="input-table-header text-center">Current costs</span>
                     <span class="input-table-header text-center">Costs with Fivetran</span>
-                    <span class="input-table-header text-center">Fivetran cost savings<span class="annotation"><br>(Current costs less costs w/Fivetran)</span></span>
+                    <span class="input-table-header text-center">Fivetran cost savings<span class="annotation"><br>(Improved productivity less before Fivetran)</span></span>
                 </div>
                 
                 <!-- Annual cost of building pipelines row -->
@@ -849,7 +858,7 @@ export default {
 
                 <!-- Totals row -->
                 <div class="table-row four-column row-totals">
-                    <span class="input-table-header text-left">Total producivity gains</span>
+                    <span class="input-table-header text-left">Total productivity gains</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.beforeFivetran) }}</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.afterFivetran) }}</span>
                     <span class="input-table-header text-center"><em>{{ this.formatDollars(this.reportOutputs.totalIDCProductivityGains.averageAnnualGain) }}</em></span>
@@ -1083,17 +1092,45 @@ label,
     content: '$'
 }
 
+.segmented-control-wrapper {
+    grid-column: 1 / span 12;
+    justify-self: start;
+    display: flex;
+    flex-direction: column;
+}
+
 .segmented-control {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    grid-column: 1 / span 12;
     margin-bottom: 48px;
+    background: white;
+    border: 1px solid var(--gray-40);
+    border-radius: 4px;
+    padding: 4px;
+    gap: 4px;
+}
 
-    div {
-        display: flex;
-        flex-direction: row;
-    }
+.segmented-control div {
+    display: flex;
+    flex-direction: row;
+}
+
+.segmented-control-button {
+    padding: 2px 4px 2px 4px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 2px;
+    margin-bottom: 0px !important;
+}
+
+.segmented-control-button:hover {
+    background: var(--blue-05);
+}
+
+.segmented-control-button.active {
+    background: var(--blue-60);
+    color: white;
 }
 
 .data-stack-staffing-field-group {
@@ -1101,10 +1138,11 @@ label,
     display: flex;
     flex-direction: column;
     gap: 16px;
-    legend {
-        padding: 0px;
-        border: none;
-    }
+}
+
+.data-stack-staffing-field-group legend {
+    padding: 0px;
+    border: none;
 }
 
 .idc-inputs-field-group {
@@ -1112,11 +1150,13 @@ label,
     display: flex;
     flex-direction: column;
     gap: 16px;
-    fieldset {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+}
+
+
+.idc-inputs-field-group fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .four-column {
@@ -1155,40 +1195,41 @@ label,
     grid-template-columns: repeat(9, 1fr);
     gap: 16px;
     align-items: center;
-    * {
-        grid-column: auto / span 3;
-    }
-
-    .output-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-
-        .output {
-            flex: 0 1 36%;
-        }
-    }
 }
+
+.data-stack-field-row * {
+    grid-column: auto / span 3;
+}
+
+
+
+.data-stack-field-row .output-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.data-stack-field-row .output {
+    flex: 0 1 36%;
+}
+
+.idc-field-row * { grid-column: auto / span 1; }
 
 .idc-field-row {
     display: grid;
     grid-template-columns: 3fr 2fr 2fr 2fr 2fr 1fr;
     gap: 16px;
     align-items: center;
-    justify-items: stretch;
-    * {
-        grid-column: auto / span 1;
-    }
-
-    .output-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        .output {
-            flex: 0 1 32%;
-        }
-    }
+    justify-items: stretch;   
 }
+
+.idc-field-row .output-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.idc-field-row .output-wrapper output { flex: 0 1 32%; }
 
 .idc-section-two-field-row {
     grid-template-columns: 3fr 2fr 2fr 2fr 1fr;
@@ -1209,19 +1250,17 @@ label,
     flex-direction: row;
     align-items: center;
     gap: 12px;
-
-    label {
-        font-size: 12px;
-        line-height: 16px;
-        font-weight: 400;
-        text-align: right;
-        flex: 0 0 60%;
-    }
-
-    input {
-        width: 100%;
-    }
 }
+
+.input-label-caption label {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    text-align: right;
+    flex: 0 0 60%;
+}
+
+.input-label-caption input { width: 100%; }
 
 .denom-hours:after {
     content: ' hrs'
@@ -1230,9 +1269,6 @@ label,
 .additional-cost-inputs {
     grid-column: 1 / span 10;
     display: flex;
-    .input-row {
-        grid-column: auto / span 9;
-    }
 }
 
 input[type=submit] {
@@ -1248,17 +1284,23 @@ input[type=submit] {
     align-self: start;
 }
 
+input[type=submit]:hover {
+    background: var(--blue-70);
+}
+
 .report {
     display: grid;
-    border: 1px solid var(--gray-90);
+    border: 1px solid var(--gray-40);
     gap: 60px;
     padding: 60px;
-    img {
+    border-radius: 4px;
+}
+
+.report img {
         grid-column: 2 / span 1;
         grid-row: 1 / span 1;
         justify-self: end;
     }
-}
 
 main {
     display: flex !important;
@@ -1271,22 +1313,20 @@ main {
 .heading-block {
     display: flex;
     justify-content: space-between;
+}
 
-    hgroup,
-    div {
+.heading-block hgroup, .heading-block div {
         display: flex;
         flex-direction: column;
         gap: 6px;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-        }
-    }
-    div {
-        align-items: end;
-    }
+.heading-block hgroup *, .heading-block-div * {
+    margin: 0;
+    padding: 0;
 }
+    
+.heading-block div { align-items: end; }
 
 .invalid,
 .invalid:focus {
@@ -1305,7 +1345,6 @@ main {
 .text-right {
     text-align: right;
 }
-
 
 .annotation {
     font-size: 12px;
@@ -1370,15 +1409,18 @@ header {
     display: flex !important;
     justify-content: space-between;
     max-width: 1280px;
-    img {
-        height: 32px;
-    }
-    ul {
-        display: flex;
-        list-style: none;
-        font-size: 14px;
-        gap: 16px;
-    }
+}
+
+header img {
+    height: 40px;
+    width: auto;
+}
+
+header ul {
+    display: flex;
+    list-style: none;
+    font-size: 14px;
+    gap: 16px;
 }
 
 .top-nav {
@@ -1428,15 +1470,20 @@ a:visited {
     grid-column: 4 / span 1;
 }
 
+
 .final-total {
     background: var(--blue-60);
 }
 
-.final-total * {
+.final-total span, .final-total em {
     color: white !important;
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 18px;
+    line-height: 24px;
     font-weight: 600;
+}
+
+.final-total span:nth-of-type(1) {
+    grid-column: auto / span 2;
 }
 
 .error, .error * {
@@ -1458,5 +1505,19 @@ a:visited {
         border: none;
     }
 }
+
+input[type="checkbox"] {
+    transform:scale(1.3, 1.3);
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+.grid-child-span-10 { grid-column: 1 / span 10}
+
+label { font-weight: 600 !important; }
+
+label i { font-weight: 400 !important; }
 
 </style>

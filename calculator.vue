@@ -901,6 +901,9 @@ export default {
                 <!-- then, v-if either of the sections above are complete, the major totals row -->
                 
         </div>
+        <div class="form-block" id="print-button">
+            <button v-if="this.complete" onclick="window.print()">Print report</button>
+        </div>
     </main>
 </template>
 
@@ -1271,7 +1274,7 @@ label,
     display: flex;
 }
 
-input[type=submit] {
+input[type=submit], button {
     background: var(--blue-60);
     color: white;
     border: none;
@@ -1284,7 +1287,7 @@ input[type=submit] {
     align-self: start;
 }
 
-input[type=submit]:hover {
+input[type=submit]:hover, button:hover {
     background: var(--blue-70);
 }
 
@@ -1501,8 +1504,11 @@ a:visited {
         display: none;
     }
 
-    .form-block-report {
+    .form-block.report {
         border: none;
+    }
+    #print-button {
+        display: none;
     }
 }
 

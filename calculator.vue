@@ -1461,7 +1461,7 @@ header ul {
 }
 
 a {
-    color: var(--gray-90);
+    color: var(--gray-90) !important;
     text-decoration: none;
 }
 

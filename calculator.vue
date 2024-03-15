@@ -741,9 +741,9 @@ export default {
             <div class="heading-block">
                 <hgroup>
                     <h2>{{ reportOutputs.companyDetails.companyName }}</h2>
-                    <p> Fivetran SaaS Connectors - ROI Analysis</p>
+                    <p>Fivetran SaaS Connectors - ROI Analysis</p>
                     <p>Generated {{ new Date().toLocaleDateString("en-US") }}</p>
-                    <p>Questions? Contact {{ reportOutputs.companyDetails.fivetranContactEmail }}</p>
+                    <p><i>Questions? Contact {{ reportOutputs.companyDetails.fivetranContactEmail }}</i></p>
                 </hgroup>
                 <div>
                     <img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg">
@@ -901,6 +901,9 @@ export default {
                 <!-- then, v-if either of the sections above are complete, the major totals row -->
                 
         </div>
+        <div class="form-block" id="print-button">
+            <button v-if="this.complete" onclick="window.print()">Print report</button>
+        </div>
     </main>
 </template>
 
@@ -909,6 +912,7 @@ export default {
     --gray-05: #F7F8FA;
     --gray-10: #EDEFF2;
     --gray-40: #B0B2B8;
+    --gray-60: #626366;
     --gray-90: #222222;
     --citron-10: #F4FFD3;
     --blue-05: #EBF1FF;
@@ -1271,7 +1275,7 @@ label,
     display: flex;
 }
 
-input[type=submit] {
+input[type=submit], button {
     background: var(--blue-60);
     color: white;
     border: none;
@@ -1284,7 +1288,7 @@ input[type=submit] {
     align-self: start;
 }
 
-input[type=submit]:hover {
+input[type=submit]:hover, button:hover {
     background: var(--blue-70);
 }
 
@@ -1324,6 +1328,22 @@ main {
 .heading-block hgroup *, .heading-block-div * {
     margin: 0;
     padding: 0;
+}
+
+hgroup h2 {
+    font-size: 28px;
+    line-height: 32px;
+    font-weight: 600;
+}
+
+hgroup p:first-of-type {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+hgroup p:last-of-type i {
+    color: var(--gray-60);
 }
     
 .heading-block div { align-items: end; }
@@ -1490,6 +1510,23 @@ a:visited {
     color: var(--red-70) !important;
     border-color: var(--red-70) !important;
     background: var(--red-05) !important;
+}
+
+@media print {
+    form {
+        display: none;
+    }
+
+    .top-nav {
+        display: none;
+    }
+
+    .form-block.report {
+        border: none;
+    }
+    #print-button {
+        display: none;
+    }
 }
 
 input[type="checkbox"] {

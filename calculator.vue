@@ -138,7 +138,7 @@ export default {
                 finance: {
                     currentEquivalentProd: 0,
                     salary: 70000,
-                    idcGain: 4,
+                    idcGain: 40,
                     include: false,
                 },
                 productManagement: {
@@ -680,7 +680,7 @@ export default {
                         <input type="number" :name="`${kebabize(key) + '_' + 'currentEquivalentProd'}`" :id="`${kebabize(key) + '_' + 'currentEquivalentProd'}`" v-model="this.idcInputs[key].currentEquivalentProd" min="0">
                         <input type="number" :name="`${kebabize(key) + '_' + 'salary'}`" :id="`${kebabize(key) + '_' + 'salary'}`" v-model="this.idcInputs[key].salary" min="0" step="1000">
                         <input type="number" :name="`${kebabize(key) + '_' + 'idcGain'}`" :id="`${kebabize(key) + '_' + 'idcGain'}`" v-model="this.idcInputs[key].idcGain" min="0" disabled>
-                        <div class="output">{{ formatDollars(this.computedIDCProductivityGains[key].afterFivetran) }}</div>
+                        <div class="output">{{ formatDollars(this.computedIDCProductivityGains[key].averageAnnualGain) }}</div>
                         <input type="checkbox" :name="`${kebabize(key) + '_' + 'include'}`" :id="`${kebabize(key) + '_' + 'include'}`" v-model="this.idcInputs[key].include">
                     </div>
                     </fieldset>

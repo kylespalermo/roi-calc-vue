@@ -1277,7 +1277,7 @@ label,
 
 input[type=submit], button {
     background: var(--blue-60);
-    color: white;
+    color: white !important;
     border: none;
     padding: 8px 16px 8px 16px;
     border-radius: 4px;

@@ -73,7 +73,7 @@ export default {
                         costOfFivetran: null,
                     }
                 },
-                databases: {
+                database: {
                     engineeringFunction: {
                         totalBuildTimePerEngineer: {
                             withoutFivetran: null,
@@ -181,6 +181,7 @@ export default {
                 }
             },
             reportOutputs: {
+                reportType: '',
                 companyDetails: {
                     companyName: '',
                     prospectiveCustomerEmail: '',
@@ -261,7 +262,7 @@ export default {
                 calcs.annualCostOfBuildingPipelines.costsWithFivetran = this.calculateAnnualCosts(engFuncs.buildingIntegrations.withFivetran, engFuncs.buildingTransformations.withFivetran)
                 calcs.annualCostOfMaintainingPipelines.currentCosts = this.calculateAnnualCosts(engFuncs.maintainingIntegrations.withoutFivetran, engFuncs.maintainingTransformations.withoutFivetran, engFuncs.deploymentAndOrchestration.withoutFivetran)
                 calcs.annualCostOfMaintainingPipelines.costsWithFivetran = this.calculateAnnualCosts(engFuncs.maintainingIntegrations.withFivetran, engFuncs.maintainingTransformations.withFivetran, engFuncs.deploymentAndOrchestration.withFivetran)
-            } else if (this.reportType == "databases") {
+            } else if (this.reportType == "database") {
                 calcs.annualCostOfBuildingPipelines.currentCosts = this.calculateAnnualCosts(engFuncs.totalBuildTimePerEngineer.withoutFivetran)
                 calcs.annualCostOfBuildingPipelines.costsWithFivetran = this.calculateAnnualCosts(engFuncs.totalBuildTimePerEngineer.withFivetran)
                 calcs.annualCostOfMaintainingPipelines.currentCosts = this.calculateAnnualCosts(engFuncs.maintenanceTimePerEngineer.withoutFivetran)
@@ -411,6 +412,8 @@ export default {
             //shorten the reference to report output object to make them more readable
             let r = this.reportOutputs;
 
+            r.reportType = this.reportType;
+
             //update companyDetails 
             r.companyDetails.companyName = this.companyDetails.companyName;
             r.companyDetails.prospectiveCustomerEmail = this.companyDetails.prospectiveCustomerEmail;
@@ -432,7 +435,7 @@ export default {
             r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.costsWithFivetran = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
             r.activitiesToBuildAndMaintainPipelines.annualCostsOfPipelineRelatedInfrastructure.fivetranCostSavings = this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withoutFivetran - this.dataStackAndStaffing[this.reportType].additionalComparisons.annualCostsOfPipelineRelatedInfrastructure.withFivetran;
 
-            if (this.reportType === "databases") {
+            if (this.reportType === "database") {
                 //databases only: cost of alternative
                 r.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts = this.dataStackAndStaffing[this.reportType].additionalCostInputs.costOfAlternative;
                 r.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran = 0;
@@ -591,8 +594,8 @@ export default {
                     <div class="segmented-control">
                         <input type="radio" id="saas" name="report-type" value="saas" v-model="reportType" checked />
                         <label class="segmented-control-button" for="saas" :class="this.reportType === 'saas' ? 'active' : ''">SaaS connectors</label>
-                        <input type="radio" id="databases" name="report-type" value="databases" v-model="reportType" />
-                        <label class="segmented-control-button" for="databases" :class="this.reportType === 'databases' ? 'active' : ''">Database connectors</label>
+                        <input type="radio" id="database" name="report-type" value="database" v-model="reportType" />
+                        <label class="segmented-control-button" for="database" :class="this.reportType === 'database' ? 'active' : ''">Database connectors</label>
                     </div>
                 </fieldset>
 
@@ -741,7 +744,7 @@ export default {
             <div class="heading-block">
                 <hgroup>
                     <h2>{{ reportOutputs.companyDetails.companyName }}</h2>
-                    <p>Fivetran SaaS Connectors - ROI Analysis</p>
+                    <p>Fivetran {{ reportOutputs.reportType }} connectors - ROI analysis</p>
                     <p>Generated {{ new Date().toLocaleDateString("en-US") }}</p>
                     <p><i>Questions? Contact {{ reportOutputs.companyDetails.fivetranContactEmail }}</i></p>
                 </hgroup>
@@ -786,7 +789,7 @@ export default {
                 </div>
 
                 <!-- Databases report only, Cost of alternative -->
-                <div v-if="this.reportType==='databases'" class="table-row four-column row-last-of-category">
+                <div v-if="reportOutputs.reportType==='database'" class="table-row four-column row-last-of-category">
                     <span class="input-table-header text-left">Cost of alternative (licensing/compute)</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfAlternative.currentCosts) }}</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfAlternative.costsWithFivetran) }}</span>
@@ -794,7 +797,7 @@ export default {
                 </div>
 
                 <!-- Databases report only, Cost of destination -->
-                <div v-if="this.reportType==='databases'" class="table-row four-column row-last-of-category">
+                <div v-if="reportOutputs.reportType==='database'" class="table-row four-column row-last-of-category">
                     <span class="input-table-header text-left">Cost of destination (i.e. ingestion costs)</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDestination.currentCosts) }}</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDestination.costsWithFivetran) }}</span>
@@ -802,7 +805,7 @@ export default {
                 </div>
 
                 <!-- Databases report only, Cost of data downtime -->
-                <div v-if="this.reportType==='databases'" class="table-row four-column row-last-of-category">
+                <div v-if="reportOutputs.reportType==='database'" class="table-row four-column row-last-of-category">
                     <span class="input-table-header text-left">Cost of data downtime</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.currentCosts) }}</span>
                     <span class="input-table-header text-center">{{ this.formatDollars(this.reportOutputs.activitiesToBuildAndMaintainPipelines.costOfDataDowntime.costsWithFivetran) }}</span>

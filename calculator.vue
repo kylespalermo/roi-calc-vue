@@ -761,7 +761,7 @@ export default {
                     <span class="input-table-header text-left">Activities to build & maintain pipelines</span>
                     <span class="input-table-header text-center">Current costs</span>
                     <span class="input-table-header text-center">Costs with Fivetran</span>
-                    <span class="input-table-header text-center">Fivetran cost savings<span class="annotation"><br>(Improved productivity less before Fivetran)</span></span>
+                    <span class="input-table-header text-center">Fivetran cost savings<span class="annotation"><br>(Current costs less costs w/Fivetran)</span></span>
                 </div>
                 
                 <!-- Annual cost of building pipelines row -->
@@ -848,7 +848,7 @@ export default {
                     <span class="input-table-header text-left">Productivity gains realized by re-deploying time saved (per IDC)</span>
                     <span class="input-table-header text-center">Before Fivetran equivalent productivity level (FTEs)</span>
                     <span class="input-table-header text-center">After Fivetran equivalent productivity level (FTEs)</span>
-                    <span class="input-table-header text-center">Productivity gains after Fivetran<span class="annotation"><br>(Current costs less costs w/Fivetran)</span></span>
+                    <span class="input-table-header text-center">Productivity gains after Fivetran<span class="annotation"><br>(Improved productivity less before Fivetran)</span></span>
                 </div>
                 
                 <!-- the rows of data -->

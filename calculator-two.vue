@@ -49,6 +49,7 @@ export default {
                 value: 1,
             },
 
+            //pipelines inputs
             pipelines: {
                 building: {
                     currentState: {
@@ -91,6 +92,8 @@ export default {
                     }
                 }
             },
+            
+            //transformations inputs
             transformations: {
                 building: {
                     currentState: {
@@ -125,6 +128,8 @@ export default {
                     }
                 }
             },
+
+            //additional comparisions and costs
             infrastructureCosts: {
                 annotation: 'annual, $',
                 currentState: {
@@ -153,12 +158,12 @@ export default {
             destinationIngestionCosts: {
                 annotation: 'annual, $',
                 currentState: {
-                    value: '',
+                    value: 0,
                     annotation: 'Data warehouse/lake ingestion costs with current solution.',
                     increment: 1000
                 },
                 withFivetran: {
-                    value: '',
+                    value: 0,
                     annotation: 'Reduced deestination ingestion costs with Fivetran',
                     increment: 1000
                 }
@@ -166,33 +171,35 @@ export default {
             costOfSolution: {
                 annotation: 'annual, $',
                 currentState: {
-                    value: '',
+                    value: 0,
                     annotation: 'Cost of alternative/incumbent solution.',
                     increment: 1000
                 },
                 withFivetran: {
-                    value: '',
+                    value: 0,
                     annotation: 'Cost of Fivetran',
                     increment: 1000
                 }
             },
 
+            //single-value inputs, last in data integration cost and maintenance section
             costOfDataDowntimePerHour: {
-                value: '',
+                value: 0,
                 annotation: '$',
                 increment: 1000,
             },
 
             additionalCosts: {
-                value: '',
+                value: 0,
                 annotation: 'annual, $',
                 increment: 1000
             },
 
+            //productivity gains by function section
             idcWorkFunctions: {
                 dataEngineers: {
                     customSalarySet: { value: false },
-                    equivalentProductivityLevel: { value: 2 },
+                    equivalentProductivityLevel: { value: 0 },
                     salary: { value: 70000 },
                     productivityGain: { value: 0.48 },
                     include: { value: false },
@@ -248,6 +255,7 @@ export default {
                 }
             },
 
+            //Overall revenue gains and operational efficiency section
             revenueGains: {
                 customSalarySet: { value: false },
                 additionalGrossRevenue: { value: 554894 },
@@ -264,24 +272,13 @@ export default {
         }
     },
     computed: {
-        annualNetGain() {
-            return this.revenueGains.additionalGrossRevenue.value * this.revenueGains.margin.value;
-        },
-        averageAnnualSaving() {
-            return this.operationalCostSavings.oneTime.value + this.operationalCostSavings.annual.value
-        },
+        
+        //calculates an hourly rate based on average salary and work schedule inputs in staffing costs section
         equivalentHourlyRate() {
             return this.averageSalary.value / (this.weeksWorkedPerYear.value * this.hoursWorkedPerWeek.value)
         },
-        idcProductivityGains(){
-            let idcProductivityGains = {};
-            for (const key in this.idcWorkFunctions) {
-                if (this.idcWorkFunctions[key].equivalentProductivityLevel.value > 0) {
-                    idcProductivityGains[key] = this.calculateIDCGains(this.idcWorkFunctions[key].salary.value, this.idcWorkFunctions[key].equivalentProductivityLevel.value, this.idcWorkFunctions[key].productivityGain.value)
-                }
-            }
-            return idcProductivityGains;
-        },
+        //displayed beneath pipelines/transformations inputs
+        //sums hours in before and after Fivetran scenarios for both categories
         totalTime() {
             let pipelines = Object.values(this.pipelines);
             let transformations = Object.values(this.transformations);
@@ -303,7 +300,34 @@ export default {
                 currentState: currentState,
                 withFivetran: withFivetran
             }
+        },
+
+        //the following three computed properties are, semantically, children of other data objects
+        //could attempt to refactor these as watchers, allowing you to call them from the main data object they're associated with.
+        //for example, operationalCostSavings.averageAnnualSaving. Trouble is calling method from within a data() object passing data() stuff as arg
+        //you'd need to move some of that data outside of data() in order to call it
+
+        //returns a before and after Fivetran scenario and total savings for each IDC work function
+        idcProductivityGains(){
+            let idcProductivityGains = {};
+            for (const key in this.idcWorkFunctions) {
+                if (this.idcWorkFunctions[key].equivalentProductivityLevel.value > 0) {
+                    idcProductivityGains[key] = this.calculateIDCGains(this.idcWorkFunctions[key].salary.value, this.idcWorkFunctions[key].equivalentProductivityLevel.value, this.idcWorkFunctions[key].productivityGain.value)
+                }
+            }
+            return idcProductivityGains;
+        },
+
+        //associated with Revenue Gains line, second-to-last IDC input
+        annualNetGain() {
+            return this.revenueGains.additionalGrossRevenue.value * this.revenueGains.margin.value;
+        },
+        
+        //associated with Operational Cost Savings line, last IDC input
+        averageAnnualSaving() {
+            return this.operationalCostSavings.oneTime.value + this.operationalCostSavings.annual.value
         }
+        
     },
     methods: {
         calculateIDCGains(salary, equivalentProductivityLevel, productivityGain) {
@@ -317,7 +341,7 @@ export default {
             }
         },
         calculateCostSavings(withFivetran, currentState) {
-            return withFivetran - currentState
+            return withFivetran - currentState;
         },
         updateIDC() {
             for(idcWorkFunctions of idcWorkFunctions) {

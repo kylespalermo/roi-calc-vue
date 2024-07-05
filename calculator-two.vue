@@ -245,7 +245,6 @@ export default {
                     salary: { value: 70000 },
                     productivityGain: { value: 0.16 },
                     include: { value: false },
-                    productivity
                 }
             },
 

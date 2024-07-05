@@ -245,6 +245,7 @@ export default {
                     salary: { value: 70000 },
                     productivityGain: { value: 0.16 },
                     include: { value: false },
+                    productivity
                 }
             },
 
@@ -253,7 +254,6 @@ export default {
                 additionalGrossRevenue: { value: 554894 },
                 margin: { value: .15 },
                 include: { value: false },
-                annualNetGain: { value: this.additionalGrossRevenue * this.margin },
             },
 
             operationalCostSavings: {
@@ -261,7 +261,6 @@ export default {
                 oneTime: { value: 285714 },
                 annual: { value: 177400 },
                 include: { value: false },
-                averageAnnualSaving: { value: this.oneTime + this.annual }
             }
         }
     },

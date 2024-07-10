@@ -502,7 +502,18 @@ export default {
 
 </script>
 <template>
-
+<div class="top-nav">
+        <header>
+            <a  href="https://www.fivetran.com/"><img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg" alt="Fivetran logo"></a>
+            <nav>
+                <ul>
+                    <li><a href="https://fivetran.com/docs/getting-started">Docs</a></li>
+                    <li><a href="https://fivetran.com/pricing">Pricing</a></li>
+                    <li><a href="https://fivetran.com/login">Sign in</a></li>
+                </ul>
+            </nav>
+        </header>
+    </div>
 <main>
 <form onsubmit="return false">
     <h1>Fivetran ROI Calculator</h1>
@@ -914,6 +925,33 @@ label {
     line-height: 20px;
     display: flex;
     justify-content: space-between;
+}
+
+header {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+    display: flex !important;
+    justify-content: space-between;
+    max-width: 1320px;
+}
+
+header img {
+    height: 40px;
+    width: auto;
+}
+
+header ul {
+    display: flex;
+    list-style: none;
+    font-size: 14px;
+    gap: 16px;
+}
+
+.top-nav {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 48px;
 }
 
 .fieldset-header, .report-table-row {

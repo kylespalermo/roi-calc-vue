@@ -9,6 +9,9 @@ export default {
             averageSalary: 80000,
         }
         return {
+            showTransformations: false,
+            showWorkSchedule: false,
+            showIDCInputs: false,
             //company profile
             //contact information
             reportOutputs: {},
@@ -449,6 +452,22 @@ export default {
                 costSavings: costSavings
             }
         },
+        submitForm() {
+            var reqs = document.querySelectorAll("[required]")
+            var numInvalid = 0;
+            reqs.forEach(req => {
+                if (!req.value) {
+                    req.classList.add("invalid")
+                    numInvalid++;
+                } else {
+                    req.classList.remove("invalid")
+                }
+            })
+            if (numInvalid === 0) {
+                this.complete = true;
+                this.generateReport();
+            }
+        },
         generateReport() {
             this.reportComplete = true;
             this.reportOutputs.contactInformation = this.contactInformation,
@@ -495,7 +514,7 @@ export default {
             <legend class="fieldset-header">Contact information</legend>
             <div class="field-label" v-for="(value, key) in this.contactInformation">
                 <label :for=key :class="value.required ? 'required' : ''">{{ sentencize(key) }}</label>
-                <input v-model="value.value" :id=key type="text">
+                <input v-model="value.value" :id=key type="text" required>
             </div>
         </fieldset>
         <!-- current staffing costs -->
@@ -512,11 +531,13 @@ export default {
         </fieldset>
         <!-- work schedule -->
         <fieldset class="flex-row" id="work-schedule">
-            <legend class="fieldset-header">Work schedule</legend>
-            <div v-for="(value, key) in this.workSchedule" class="field-box">
-                <label>{{ value.annotation }}</label>
-                <input v-model="value.value" :id="key" type="number" :min="value.min ? value.min : 0" :max="value.max ? value.max : 0">
-            </div>
+            <legend class="fieldset-header collapsible-trigger" :class="showWorkSchedule ? 'active' : ''" @click="showWorkSchedule = !showWorkSchedule">Work schedule</legend>
+            <template v-if="showWorkSchedule">
+                <div v-for="(value, key) in this.workSchedule" class="field-box">
+                    <label>{{ value.annotation }}</label>
+                    <input v-model="value.value" :id="key" type="number" :min="value.min ? value.min : 0" :max="value.max ? value.max : 0">
+                </div>
+            </template>
         </fieldset>
     </section>
 
@@ -545,29 +566,19 @@ export default {
         <!-- Transformations -->
         <fieldset id="transformations">
             <div class="fieldset-header">
-                <legend>Transformations</legend>
+                <legend class="collapsible-trigger" :class="showTransformations ? 'active' : ''" @click="showTransformations = !showTransformations">Transformations</legend>
             </div>
-            <div v-for="(value, key) in this.transformations" class="input-row">
-                <label>{{ sentencize(key) }}</label>
-                <div v-for="(nestedValue, nestedKey) in value" class="annotated-input">
-                    <label>{{ nestedValue.annotation }}</label>
-                    <input v-model="nestedValue.value" :id=nestedKey min="0" type="number">
+            <template v-if="showTransformations">
+                <div v-for="(value, key) in this.transformations" class="input-row">
+                    <label>{{ sentencize(key) }}</label>
+                    <div v-for="(nestedValue, nestedKey) in value" class="annotated-input">
+                        <label>{{ nestedValue.annotation }}</label>
+                        <input v-model="nestedValue.value" :id=nestedKey min="0" type="number">
+                    </div>
                 </div>
-            </div>
+            </template>
         </fieldset>
         <!-- Additional comparisons and costs -->
-        <fieldset id="transformations">
-            <div class="fieldset-header">
-                <legend>Transformations</legend>
-            </div>
-            <div v-for="(value, key) in this.transformations" class="input-row">
-                <label>{{ sentencize(key) }}</label>
-                <div v-for="(nestedValue, nestedKey) in value" class="annotated-input">
-                    <label>{{ nestedValue.annotation }}</label>
-                    <input v-model="nestedValue.value" :id=nestedKey min="0" type="number">
-                </div>
-            </div>
-        </fieldset>
         <fieldset id="additional-comparisons-and-costs">
             <div class="fieldset-header">
                 <legend>Additional comparisons and costs</legend>
@@ -613,31 +624,33 @@ export default {
         </div>
     </section>
     <section class="form-block" id="business-impact-of-fivetran">
-        <h2>Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise">per IDC research)</a></h2>
-        <hgroup>
-            <h3>Productivity gains with Fivetran</h3>
-            <p>IDC conducted a recent study of Fivetran customers and found that study participants achieved benefits worth an average of $3,642,700 per organization over three years through more productive staff performance and business enablement.</p>
-        </hgroup>
-        <fieldset>
-            <div class="fieldset-header">
-                <legend>Productivity gains by function</legend>
-                <span>Equivalent productivity level (FTEs)</span>
-                <span>Salary</span>
-                <span>Productivity gain (%)</span>
-                <span>Average Annual Gain</span>
-                <span>Include?</span>
-            </div>
-            <div v-for="(value, key) in this.idcWorkFunctions" class="input-row">
-                <label>{{ sentencize(key) }}</label>
-                <input v-model="value.equivalentProductivityLevel.value" :id="`${key}_equivalentProductivityLevel`" min="0" type="number">
-                <input v-model="value.salary.value" :id="`${key}_salary`" min="0" type="number" step="1000">
-                <div class="const-input" :id="`${key}_productivityGain`">{{ Math.round(value.productivityGain.value * 100) }}</div>
-                <output>{{ formatDollars(this.idcProductivityGains[key].averageAnnualGain) }}</output>
-                <input v-model="value.include.value" :id="`${key}_include`" type="checkbox">
-            </div>
-        </fieldset>
+        <h2 class="collapsible-trigger" :class="showIDCInputs ? 'active' : ''" @click="showIDCInputs = !showIDCInputs">Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise">per IDC research)</a></h2>
+        <template v-if="this.showIDCInputs">
+            <hgroup>
+                <h3>Productivity gains with Fivetran</h3>
+                <p>IDC conducted a recent study of Fivetran customers and found that study participants achieved benefits worth an average of $3,642,700 per organization over three years through more productive staff performance and business enablement.</p>
+            </hgroup>
+            <fieldset>
+                <div class="fieldset-header">
+                    <legend>Productivity gains by function</legend>
+                    <span>Equivalent productivity level (FTEs)</span>
+                    <span>Salary</span>
+                    <span>Productivity gain (%)</span>
+                    <span>Average Annual Gain</span>
+                    <span>Include?</span>
+                </div>
+                <div v-for="(value, key) in this.idcWorkFunctions" class="input-row">
+                    <label>{{ sentencize(key) }}</label>
+                    <input v-model="value.equivalentProductivityLevel.value" :id="`${key}_equivalentProductivityLevel`" min="0" type="number">
+                    <input v-model="value.salary.value" :id="`${key}_salary`" min="0" type="number" step="1000">
+                    <div class="const-input" :id="`${key}_productivityGain`">{{ Math.round(value.productivityGain.value * 100) }}</div>
+                    <output>{{ formatDollars(this.idcProductivityGains[key].averageAnnualGain) }}</output>
+                    <input v-model="value.include.value" :id="`${key}_include`" type="checkbox">
+                </div>
+            </fieldset>
+        </template>
     </section>
-    <input type="submit" :value="this.reportComplete ? 'Update report' : 'Generate report'" id="generate-report" @click="generateReport">
+    <input type="submit" :value="this.reportComplete ? 'Update report' : 'Generate report'" id="generate-report" @click="submitForm">
 </form>
 
 <section v-if="this.reportComplete" class="form-block report">
@@ -698,6 +711,28 @@ export default {
 </template>
 
 <style>
+
+.collapsible-trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.collapsible-trigger::before {
+    content: url('https://uploads-ssl.webflow.com/624da42b5f2beca5145266dc/624da42b5f2bec5610526dac_select-arrow.svg');
+    margin-right: 6px;
+    scale: .85;
+    transform: rotate(-90deg);
+}
+
+.collapsible-trigger.active::before {
+    transform: rotate(0deg);
+}
+
+#business-impact-of-fivetran .collapsible-trigger::before {
+    scale: 1.2;
+    margin-right: 12px;
+}
 
 .report-table-section:nth-child(3) { grid-area: three; }
 .report-table-section:nth-child(4) { grid-area: four; }
@@ -832,8 +867,6 @@ form {
     padding: 40px;
     background: var(--gray-05);
     border-radius: 8px;
-    grid-auto-flow: column;
-    justify-content: space-between;
 }
 
 h1, h2, h3, h4, h5, h6, legend, label {
@@ -844,14 +877,11 @@ h1, h2, h3, h4, h5, h6, legend, label {
 h1 {
     font-size: 36px;
     line-height: 48px;
-    margin-bottom: 24px;
 }
 
 h2 {
     font-size: 24px;
     line-height: 36px;
-    margin-bottom: 12px;
-
 }
 
 input, output, .const-input {
@@ -875,6 +905,10 @@ legend, label, .fieldset-header span {
     line-height: 20px;
 }
 
+legend {
+    width: 100%;
+}
+
 label {
     font-size: 14px;
     line-height: 20px;
@@ -886,7 +920,6 @@ label {
     border-bottom: 1px solid var(--gray-90);
     padding: 0px 0px 8px 0px;
     margin-bottom: 16px;
-    align-items: end;
 }
 
 .fieldset-header *:nth-child(n+2), .report-table-row *:nth-child(n+2) {
@@ -911,7 +944,6 @@ label {
     border-radius: 4px;
     background: var(--gray-10);
     border: 1px solid var(--gray-40);
-    align-self: stretch;
 }
 
 .field-box label {
@@ -1071,7 +1103,11 @@ input[type="checkbox"] {
     accent-color: var(--blue-60);
 }
 
-
+.invalid,
+.invalid:focus {
+    outline: red;
+    border-color: red;
+}
 
 /* utility classes */
 
@@ -1085,8 +1121,12 @@ input[type="checkbox"] {
     flex-direction: row;
     display: flex;
     gap: 20px;
+    align-items: start;
+    height: 1px;
 }
 
 .subgrid { grid-template-columns: subgrid; }
+
+
 
 </style>

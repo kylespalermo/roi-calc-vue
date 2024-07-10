@@ -209,7 +209,6 @@ export default {
             additionalCosts: {
                 value: 0,
                 annotation: 'annual, $',
-                increment: 1000
             },
 
             //productivity gains by function section
@@ -267,7 +266,8 @@ export default {
             //Overall revenue gains and operational efficiency section
             revenueGains: {
                 additionalGrossRevenue: { value: 554894 },
-                margin: { value: .15 },
+                //margin is a percentage, but we're storing as int. So "15" = "15%". Solve in future w/custom input.
+                margin: { value: 15 },
                 include: { value: false },
             },
 
@@ -320,7 +320,7 @@ export default {
 
         //associated with Revenue Gains line, second-to-last IDC input
         annualNetGain() {
-            return this.revenueGains.additionalGrossRevenue.value * this.revenueGains.margin.value;
+            return this.revenueGains.additionalGrossRevenue.value * (this.revenueGains.margin.value/100);
         },
         
         //associated with Operational Cost Savings line, last IDC input
@@ -364,7 +364,7 @@ export default {
             });
 
             if (currentStateHours + withFivetranHours === 0) {
-                return false;
+                return null;
             }
 
             let currentState = currentStateHours * this.workSchedule.weeksWorkedPerYear.value * this.equivalentHourlyRate;
@@ -390,7 +390,7 @@ export default {
             let hoursPerYear = 24*365;
 
             if (this.costOfDataDowntimePerHour.value === 0) {
-                return false;
+                return null;
             }
             
             let currentState = hoursPerYear * this.costOfDataDowntimePerHour.value * (1 - (this.dataUptime.currentState.value * .01));
@@ -409,7 +409,7 @@ export default {
             let withFivetran = obj.withFivetran.value;
 
             if (currentState + withFivetran === 0) {
-                return false;
+                return null;
             }
 
             return {
@@ -425,7 +425,6 @@ export default {
             let costSavings = 0;
             
             for (let line in lines) {
-                console.log(lines[line])
                 if (lines[line]) {
                     currentState += lines[line][keys[0]];
                     withFivetran += lines[line][keys[1]];
@@ -456,7 +455,6 @@ export default {
             }
         },
         generateReport() {
-            this.reportComplete = true;
             this.reportOutputs.contactInformation = this.contactInformation,
             this.reportOutputs.dataIntegrationCostAndMaintenance = {
                 buildingPipelines: this.calculateDataIntegrationCostAndMaintenance(this.pipelines.building),
@@ -470,6 +468,12 @@ export default {
                 additionalCosts: this.formatInputsValueForReport({ currentState: { value: this.additionalCosts.value }, withFivetran: { value: 0 } }) 
             }
 
+            for (let key in this.reportOutputs.dataIntegrationCostAndMaintenance) {
+                if (this.reportOutputs.dataIntegrationCostAndMaintenance[key] === null) {
+                    delete this.reportOutputs.dataIntegrationCostAndMaintenance[key]
+                }
+            }
+
             this.reportOutputs.idcProductivityGains = {}
 
             for (let key in this.idcWorkFunctions) {
@@ -478,11 +482,30 @@ export default {
                 }
             }
 
+            this.reportOutputs.idcRevenueGains = {}
+
+            if (this.operationalCostSavings.include.value) { this.reportOutputs.idcRevenueGains.operationalCostSavings = this.averageAnnualSaving }
+            if (this.revenueGains.include.value) { this.reportOutputs.idcRevenueGains.revenueGains = this.annualNetGain }
+
             this.reportSums.dataIntegrationCostAndMaintenance = this.sumReportLines(this.reportOutputs.dataIntegrationCostAndMaintenance);
             this.reportSums.idcProductivityGains = this.sumReportLines(this.reportOutputs.idcProductivityGains, ['currentState', 'withFivetran', 'averageAnnualGain']);
+            this.reportSums.totalRevenueGain = {}
+            this.reportSums.totalRevenueGain.costSavings = Object.values(this.reportOutputs.idcRevenueGains).reduce((a, b) => a + b, 0);
+            
+            this.reportOutputs.overallSavings = 0;
+            for (let key in this.reportSums) {
+                console.log(key + "//" + this.reportSums[key].costSavings);
+                this.reportOutputs.overallSavings += this.reportSums[key].costSavings;
+            }
 
-            // console.log(this.reportSums.idcProductivityGains)
-            // console.log(this.reportSums)
+            if (Object.keys(this.reportOutputs.dataIntegrationCostAndMaintenance).length === 0
+            && Object.keys(this.reportOutputs.idcProductivityGains).length === 0
+            && Object.keys(this.reportOutputs.idcRevenueGains).length === 0) {
+                alert('Please enter some data to include in the report')    
+            } else {
+                this.reportComplete = true;
+            }
+
         }
     }
 }
@@ -638,30 +661,76 @@ export default {
             <section class="form-block" id="business-impact-of-fivetran">
                 <h2 class="collapsible-trigger" :class="showIDCInputs ? 'active' : ''" @click="showIDCInputs = !showIDCInputs">Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise">per IDC research</a>)</h2>
                 <!-- productivity gains with Fivetran -->
-                <div class="input-group" v-if="this.showIDCInputs">
-                    <hgroup>
-                        <h3>Productivity gains with Fivetran</h3>
-                        <p>IDC conducted a recent study of Fivetran customers and found that study participants achieved benefits worth an average of $3,642,700 per organization over three years through more productive staff performance and business enablement.</p>
-                    </hgroup>
-                    <fieldset>
-                        <div class="row-header">
-                            <legend>Productivity gains by function</legend>
-                            <span>Equivalent productivity level (FTEs)</span>
-                            <span>Salary</span>
-                            <span>Productivity gain (%)</span>
-                            <span>Average Annual Gain</span>
-                            <span>Include?</span>
-                        </div>
-                        <div v-for="(value, key) in this.idcWorkFunctions" class="input-row">
-                            <label>{{ sentencize(key) }}</label>
-                            <input v-model="value.equivalentProductivityLevel.value" :id="`${key}_equivalentProductivityLevel`" min="0" type="number">
-                            <input v-model="value.salary.value" :id="`${key}_salary`" min="0" type="number" step="1000">
-                            <div class="const-input" :id="`${key}_productivityGain`">{{ Math.round(value.productivityGain.value * 100) }}</div>
-                            <output>{{ formatDollars(this.idcProductivityGains[key].averageAnnualGain) }}</output>
-                            <input v-model="value.include.value" :id="`${key}_include`" type="checkbox">
-                        </div>
-                    </fieldset>
-                </div>
+                <template v-if="this.showIDCInputs">
+                    <div class="input-group">
+                        <hgroup>
+                            <h3>Productivity gains with Fivetran</h3>
+                            <p>IDC conducted a recent study of Fivetran customers and found that study participants achieved benefits worth an average of $3,642,700 per organization over three years through more productive staff performance and business enablement.</p>
+                        </hgroup>
+                        <fieldset id="productivity-gains-with-fivetran">
+                            <div class="row-header">
+                                <legend>Productivity gains by function</legend>
+                                <span>Equivalent productivity level (FTEs)</span>
+                                <span>Salary</span>
+                                <span>Productivity gain (%)</span>
+                                <span>Average Annual Gain</span>
+                                <span>Include?</span>
+                            </div>
+                            <div v-for="(value, key) in this.idcWorkFunctions" class="input-row">
+                                <label>{{ sentencize(key) }}</label>
+                                <input v-model="value.equivalentProductivityLevel.value" :id="`${key}_equivalentProductivityLevel`" min="0" type="number">
+                                <input v-model="value.salary.value" :id="`${key}_salary`" min="0" type="number" step="1000">
+                                <div class="const-input" :id="`${key}_productivityGain`">{{ Math.round(value.productivityGain.value * 100) }}</div>
+                                <output>{{ formatDollars(this.idcProductivityGains[key].averageAnnualGain) }}</output>
+                                <input v-model="value.include.value" :id="`${key}_include`" type="checkbox">
+                            </div>
+                        </fieldset>
+                    </div>
+                    <!-- Overall revenue gains and operational efficiency -->
+                    <div class="input-group" id="overall-revenue-gains-and-operational-efficiency">
+                        <hgroup>
+                            <h3>Overall revenue gains and operational efficiency</h3>
+                            <p>Interviewed organizations attributed higher revenue to their use of Fivetran. Near-real-time access to high-quality data enabled interviewed organizations to better serve their customers, support products or business initiatives with data-backed insights, and plan more strategically.</p>
+                        </hgroup>
+                        <!-- revenue gains -->
+                        <fieldset id="revenue-gains">
+                            <div class="row-header">
+                                <legend class="hidden">Revenue gains</legend>
+                                <span>Additional gross revenue ($)</span>
+                                <span>Margin (percent)</span>
+                                <span>Annual net gain</span>
+                                <span>Include?</span>
+                            </div>
+                            <div class="input-row">
+                                <div class="label-like annotated-label">
+                                    Revenue gains
+                                    <p>Study participants were able to reduce bad technical debt and be more operationally resilient to business challenges - reducing overall operating costs.</p>
+                                </div>
+                                <input v-model="this.revenueGains.additionalGrossRevenue.value" id="revenueGains_oneTime" type="number" min="0">
+                                <input v-model="this.revenueGains.margin.value" id="revenueGains_margin" type="number" min="0">
+                                <output>{{ this.formatDollars(this.annualNetGain) }}</output>
+                                <input v-model="this.revenueGains.include.value" id="revenueGains_include" type="checkbox">
+                            </div>
+                        </fieldset>
+                        <!-- operational cost savings -->
+                        <fieldset>
+                            <div class="row-header">
+                                <legend class="hidden">Operational cost savings</legend>
+                                <span>One-time ($)</span>
+                                <span>Annual</span>
+                                <span>Average annual saving</span>
+                                <span>Include?</span>
+                            </div>
+                            <div class="input-row">
+                                <div class="label-like">Operational cost savings</div>
+                                <input v-model="this.operationalCostSavings.oneTime.value" id="operationalCostSavings_oneTime" type="number" min="0">
+                                <input v-model="this.operationalCostSavings.annual.value" id="operationalCostSavings_annual" type="number" min="0">
+                                <output>{{ this.formatDollars(this.averageAnnualSaving) }}</output>
+                                <input v-model="this.operationalCostSavings.include.value" id="operationalCostSavings_inlclude" type="checkbox">
+                            </div>
+                        </fieldset>
+                    </div>
+                </template>
             </section>
             <input type="submit" :value="this.reportComplete ? 'Update report' : 'Generate report'" id="generate-report" @click="submitForm">
         </form>
@@ -671,7 +740,7 @@ export default {
             <hgroup class="report-heading">
                 <h2>
                     {{ this.reportOutputs.contactInformation.companyName.value }}
-                    <p class="report-subhead">ROI analaysis</p>
+                    <p class="report-subhead">ROI analysis</p>
                 </h2>
                 <p>Generated {{ new Date().toLocaleDateString("en-US") }}</p>
                 <p>Questions? Contact {{ this.reportOutputs.contactInformation.prospectiveCustomerEmail.value }}</p>
@@ -681,7 +750,7 @@ export default {
                 <span>fivetran.com</span>
             </div>
             <!-- report section one -->
-            <div class="report-table-section">
+            <div v-if="Object.keys(this.reportOutputs.dataIntegrationCostAndMaintenance).length > 0" class="report-table-section">
                 <h3>Data integration cost and maintenance (annual)</h3>
                 <div class="report-table-row row-header">
                     <span>Cost category</span>
@@ -705,7 +774,7 @@ export default {
                 </div>
             </div>
             <!-- report section two -->
-            <div class="report-table-section">
+            <div v-if="Object.keys(this.reportOutputs.idcProductivityGains).length > 0" class="report-table-section">
                 <h3>Business impact of Fivetran (per IDC research)</h3>
                 <div class="report-table-row row-header">
                     <span>Productivity gains</span>
@@ -726,6 +795,29 @@ export default {
                     <span>{{ this.formatDollars(this.reportSums.idcProductivityGains.costSavings) }}</span>
                 </div>
             </div>
+            <!-- report section three -->
+            <div v-if="Object.keys(this.reportOutputs.idcRevenueGains).length > 0" class="report-table-section">
+                <div class="report-table-row row-header two-col">
+                    <span>Overall revenue gains and operational efficiency</span>
+                    <span>Average annual gain</span>
+                </div>
+                <div v-if="this.reportOutputs.idcRevenueGains.revenueGains" class="report-table-row two-col">
+                    <span>Revenue gains</span>
+                    <span>{{ this.formatDollars(this.reportOutputs.idcRevenueGains.revenueGains) }}</span>
+                </div>
+                <div v-if="this.reportOutputs.idcRevenueGains.operationalCostSavings" class="report-table-row two-col">
+                    <span>Operational cost savings</span>
+                    <span>{{ this.formatDollars(this.reportOutputs.idcRevenueGains.operationalCostSavings) }}</span>
+                </div>
+                <div class="total-wrapper report-table-row two-col">
+                    <span>Total</span>
+                    <span>{{ this.formatDollars(this.reportSums.totalRevenueGain.costSavings) }}</span>
+                </div>
+            </div>
+            <div class="total-wrapper report-table-row two-col grand-total">
+                <span>Overall benefit</span>
+                <span>{{ this.formatDollars(this.reportOutputs.overallSavings) }}</span>
+            </div>
         </section>
 
         <div v-if="this.reportComplete" id="print-button">
@@ -735,6 +827,25 @@ export default {
 </template>
 
 <style>
+
+.grand-total {
+    background: var(--blue-60) !important;
+    font-weight: 600 !important;
+    border: unset !important;
+    grid-area: 6;
+}
+
+.grand-total span {
+    color: white !important;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+}
+
+.two-col {
+    grid-template-columns: repeat(2, 1fr) !important;
+    display: grid;
+}
 
 a {
     text-decoration: none;
@@ -771,9 +882,10 @@ nav a {
     margin-right: 12px;
 }
 
-.report-table-section:nth-child(3) { grid-area: three; }
-.report-table-section:nth-child(4) { grid-area: four; }
-.report-table-section:nth-child(5) { grid-area: five; }
+.report-table-section, .grand-total {
+    grid-column: 1 / span 12;
+    grid-row: auto;
+}
 
 .report-table-section {
     display: flex;
@@ -805,11 +917,7 @@ nav a {
 }
 
 .report {
-    grid-template-areas: 
-    "one one one one one one . . two two two two"
-    "three three three three three three three three three three three three"
-    "four four four four four four four four four four four four"
-    "five five five five five five five five five five five five";
+    grid-template-columns: repeat(12, 1fr);
     background: white !important;
     border-radius: 0px !important;
     border: 1px solid var(--gray-40);
@@ -817,7 +925,7 @@ nav a {
 }
 
 .report-heading {
-    grid-area: one;
+    grid-column: 1 / span 6;
 }
 
 .report-heading > p {
@@ -843,7 +951,7 @@ nav a {
 }
 
 .report-logo {
-    grid-area: two;
+    grid-column: 10 / span 3;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -854,7 +962,7 @@ nav a {
     grid-template-columns: subgrid;
     display: grid;
     grid-column: 1 / -1;
-    row-gap: 40px;
+    row-gap: 48px;
 }
 
 .report-logo img {
@@ -930,7 +1038,7 @@ form {
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: auto;
     column-gap: 20px;
-    row-gap: 60px;
+    row-gap: 72px;
     padding: 40px;
     background: var(--gray-05);
     border-radius: 8px;
@@ -1033,6 +1141,10 @@ header ul {
     padding-bottom: 8px;
 }
 
+.report-table-row.row-header span {
+    font-size: 16px !important;
+}
+
 .report-table-row:not(.row-header) > *:first-child {
     font-weight: 500;
 }
@@ -1075,6 +1187,20 @@ header ul {
     grid-template-columns: 2fr 1fr;
     align-items: center;
     justify-items: stretch;
+}
+
+.annotated-label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 45ch;
+}
+
+.annotated-label p {
+    font-size: 14px;
+    line-height: 16px;
+    font-style: italic;
+    font-weight: 400;
 }
 
 .annotated-input label {
@@ -1210,10 +1336,21 @@ output {
     grid-template-columns: subgrid;
 }
 
-#business-impact-of-fivetran .row-header, #business-impact-of-fivetran .input-row {
+.input-row {
+    align-items: center;
+}
+
+#productivity-gains-with-fivetran .row-header, #productivity-gains-with-fivetran .input-row {
     grid-column: 1 / span 12;
     display: grid;
     grid-template-columns: 3fr 2fr 2fr 2fr 2fr 1fr;
+    gap: 20px;
+}
+
+#overall-revenue-gains-and-operational-efficiency .row-header, #overall-revenue-gains-and-operational-efficiency .input-row {
+    grid-column: 1 / span 12;
+    display: grid;
+    grid-template-columns: 5fr 2fr 2fr 2fr 1fr;
     gap: 20px;
 }
 
@@ -1237,7 +1374,7 @@ input[type=submit]:hover, button:hover {
 input[type="checkbox"] {
     accent-color: var(--blue-60);
     justify-self: end;
-    width: 20px;
+    scale: 1.5;
 }
 
 .invalid,

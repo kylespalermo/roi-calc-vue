@@ -856,7 +856,7 @@ a:hover {
 }
 
 nav a {
-    color: var(--gray-90);
+    color: var(--gray-90) !important;
 }
 
 .collapsible-trigger {

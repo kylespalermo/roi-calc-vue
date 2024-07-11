@@ -295,8 +295,8 @@ export default {
             let totalCurrentTransformationsHours = transformations.reduce((total, obj) => obj.currentState.value + total, 0);
             let totalFivetranTransformationsHours = transformations.reduce((total, obj) => obj.withFivetran.value + total, 0);
 
-            let currentState = totalCurrentPipelineHours + totalCurrentTransformationsHours;
-            let withFivetran = totalFivetranPipelineHours + totalFivetranTransformationsHours;
+            let currentState = (totalCurrentPipelineHours + totalCurrentTransformationsHours) * this.numberOfEngineers.value;
+            let withFivetran = (totalFivetranPipelineHours + totalFivetranTransformationsHours) * this.numberOfEngineers.value;
 
             return {
                 currentState: currentState,
@@ -517,9 +517,9 @@ export default {
                 <a  href="https://www.fivetran.com/"><img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg" alt="Fivetran logo"></a>
                 <nav>
                     <ul>
-                        <li><a href="https://fivetran.com/docs/getting-started">Docs</a></li>
-                        <li><a href="https://fivetran.com/pricing">Pricing</a></li>
-                        <li><a href="https://fivetran.com/login">Sign in</a></li>
+                        <li><a href="https://fivetran.com/docs/getting-started" target="_blank">Docs</a></li>
+                        <li><a href="https://fivetran.com/pricing" target="_blank">Pricing</a></li>
+                        <li><a href="https://fivetran.com/login" target="_blank">Sign in</a></li>
                     </ul>
                 </nav>
             </header>
@@ -543,7 +543,7 @@ export default {
                     <legend class="row-header">Current staffing costs</legend>
                     <div class="field-box">
                         <label>{{ this.averageSalary.annotation }}</label>
-                        <input v-model="this.averageSalary.value" id="averageSalary" type="number" :step="this.averageSalary.increment" :min="this.averageSalary.min ? this.averageSalary.min : 0">
+                        <input v-model="this.averageSalary.value" id="averageSalary" type="number" :min="this.averageSalary.min ? this.averageSalary.min : 0">
                     </div>
                     <div class="field-box">
                         <label>Equivalent hourly rate</label>
@@ -600,7 +600,7 @@ export default {
                     </template>
                 </fieldset>
                 <div id="total-time">
-                    <div class="label-like">Total time</div>
+                    <div class="label-like">Total time (hours)</div>
                     <div class="annotated-input">
                         <label></label>
                         <output>{{ this.totalTime.currentState }}</output>    
@@ -621,45 +621,45 @@ export default {
                         <label>Infrastructure costs (annual, $)</label>
                         <div v-for="(nestedValue, nestedKey) in this.infrastructureCosts" class="annotated-input">
                             <label>{{ nestedValue.annotation }}</label>
-                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number" :step="nestedValue.increment">
+                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number">
                         </div>
                     </div>
                     <div class="input-row">
                         <label>Data uptime (percent)</label>
                         <div v-for="(nestedValue, nestedKey) in this.dataUptime" class="annotated-input">
                             <label>{{ nestedValue.annotation }}</label>
-                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number" :step="nestedValue.increment">
+                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number" step=".01">
                         </div>
                     </div>
                     <div class="input-row">
                         <label>Destination ingest costs (annual, $)</label>
                         <div v-for="(nestedValue, nestedKey) in this.destinationIngestionCosts" class="annotated-input">
                             <label>{{ nestedValue.annotation }}</label>
-                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number" :step="nestedValue.increment">
+                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number">
                         </div>
                     </div>
                     <div class="input-row">
                         <label>Cost of solution (annual, $)</label>
                         <div v-for="(nestedValue, nestedKey) in this.costOfSolution" class="annotated-input">
                             <label>{{ nestedValue.annotation }}</label>
-                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number" :step="nestedValue.increment">
+                            <input v-model="nestedValue.value" :id=nestedKey min="0" type="number">
                         </div>
                     </div>
                 </fieldset>
                 <!-- single-input-fields -->
                 <div class="field-box" id="cost-of-data-downtime-per-hour">
                     <label>Cost of data downtime per hour ($)</label>
-                    <input v-model="this.costOfDataDowntimePerHour.value" type="number" min="0" :step="this.costOfDataDowntimePerHour.increment">
+                    <input v-model="this.costOfDataDowntimePerHour.value" type="number" min="0">
                 </div>
                 <div class="field-box" id="additional-costs">
                     <label>Additional costs</label>
-                    <input v-model="this.additionalCosts.value" type="number" min="0" :step="this.additionalCosts.increment">
+                    <input v-model="this.additionalCosts.value" type="number" min="0">
                 </div>
             </section>
 
             <!-- business impact of Fivetran -->
             <section class="form-block" id="business-impact-of-fivetran">
-                <h2 class="collapsible-trigger" :class="showIDCInputs ? 'active' : ''" @click="showIDCInputs = !showIDCInputs">Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise">per IDC research</a>)</h2>
+                <h2 class="collapsible-trigger" :class="showIDCInputs ? 'active' : ''" @click="showIDCInputs = !showIDCInputs">Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise" target="_blank">per IDC research</a>)</h2>
                 <!-- productivity gains with Fivetran -->
                 <template v-if="this.showIDCInputs">
                     <div class="input-group">
@@ -679,7 +679,7 @@ export default {
                             <div v-for="(value, key) in this.idcWorkFunctions" class="input-row">
                                 <label>{{ sentencize(key) }}</label>
                                 <input v-model="value.equivalentProductivityLevel.value" :id="`${key}_equivalentProductivityLevel`" min="0" type="number">
-                                <input v-model="value.salary.value" :id="`${key}_salary`" min="0" type="number" step="1000">
+                                <input v-model="value.salary.value" :id="`${key}_salary`" min="0" type="number">
                                 <div class="const-input" :id="`${key}_productivityGain`">{{ Math.round(value.productivityGain.value * 100) }}</div>
                                 <output>{{ formatDollars(this.idcProductivityGains[key].averageAnnualGain) }}</output>
                                 <input v-model="value.include.value" :id="`${key}_include`" type="checkbox">
@@ -775,7 +775,7 @@ export default {
             </div>
             <!-- report section two -->
             <div v-if="Object.keys(this.reportOutputs.idcProductivityGains).length > 0" class="report-table-section">
-                <h3>Business impact of Fivetran (per IDC research)</h3>
+                <h3>Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise" target="_blank">per IDC research</a>)</h3>
                 <div class="report-table-row row-header">
                     <span>Productivity gains</span>
                     <span>Before Fivetran</span>
@@ -1407,6 +1407,12 @@ input[type="checkbox"] {
 .subgrid { grid-template-columns: subgrid; }
 
 @media print {
+
+    body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
     form {
         display: none;
     }

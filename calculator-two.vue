@@ -19,11 +19,11 @@ export default {
                     value: ''
                 },
 
-                prospectiveCustomerEmail: {
-                    annotation: 'Prospective customer email',
-                    required: true,
-                    value: ''
-                },
+                // prospectiveCustomerEmail: {
+                //     annotation: 'Prospective customer email',
+                //     required: true,
+                //     value: ''
+                // },
 
                 fivetranContactEmail: {
                     annotation: 'Fivetran contact email',
@@ -743,15 +743,15 @@ export default {
                     <p class="report-subhead">ROI analysis</p>
                 </h2>
                 <p>Generated {{ new Date().toLocaleDateString("en-US") }}</p>
-                <p>Questions? Contact {{ this.reportOutputs.contactInformation.prospectiveCustomerEmail.value }}</p>
+                <p>Questions? Contact {{ this.reportOutputs.contactInformation.fivetranContactEmail.value }}</p>
             </hgroup>
             <div class="report-logo">
                 <img src="https://uploads-ssl.webflow.com/65ccfe0bfacd7e43c72090d6/65cd01136286d65c8f9a20cf_fivetran.svg">
                 <span>fivetran.com</span>
             </div>
             <!-- report section one -->
+            <h3 v-if="Object.keys(this.reportOutputs.dataIntegrationCostAndMaintenance).length > 0">Data integration cost and maintenance (annual)</h3>
             <div v-if="Object.keys(this.reportOutputs.dataIntegrationCostAndMaintenance).length > 0" class="report-table-section">
-                <h3>Data integration cost and maintenance (annual)</h3>
                 <div class="report-table-row row-header">
                     <span>Cost category</span>
                     <span>Current costs</span>
@@ -774,8 +774,8 @@ export default {
                 </div>
             </div>
             <!-- report section two -->
+            <h3 v-if="Object.keys(this.reportOutputs.idcProductivityGains).length > 0 || Object.keys(this.reportOutputs.idcRevenueGains).length > 0" >Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise" target="_blank">per IDC research</a>)</h3>
             <div v-if="Object.keys(this.reportOutputs.idcProductivityGains).length > 0" class="report-table-section">
-                <h3>Business impact of Fivetran (<a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise" target="_blank">per IDC research</a>)</h3>
                 <div class="report-table-row row-header">
                     <span>Productivity gains</span>
                     <span>Before Fivetran</span>
@@ -911,9 +911,9 @@ nav a {
     gap: 20px;
 }
 
-.report-table-section h3 {
-    flex-basis: 100%;
-    margin-bottom: 28px;
+.report h3 {
+    grid-column: 1 / span 12;
+    margin-bottom: -12px;
 }
 
 .report {
@@ -1401,7 +1401,7 @@ input[type="checkbox"] {
     display: flex;
     gap: 20px;
     align-items: start;
-    height: 1px;
+    height: min-content;
 }
 
 .subgrid { grid-template-columns: subgrid; }

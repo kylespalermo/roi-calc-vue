@@ -494,7 +494,6 @@ export default {
             
             this.reportOutputs.overallSavings = 0;
             for (let key in this.reportSums) {
-                console.log(key + "//" + this.reportSums[key].costSavings);
                 this.reportOutputs.overallSavings += this.reportSums[key].costSavings;
             }
 
@@ -849,7 +848,7 @@ export default {
 
 a {
     text-decoration: none;
-    color: var(--blue-60);
+    color: var(--blue-60) !important;
 }
 
 a:hover {
@@ -940,8 +939,8 @@ nav a {
 }
 
 .report-heading h2 {
-    font-size: 28px;
-    margin-bottom: 24px;
+    font-size: 28px !important;
+    margin-bottom: 24px !important;
 }
 
 .report-subhead {
@@ -1045,7 +1044,7 @@ form {
 }
 
 h1, h2, h3, h4, h5, h6, legend, label {
-    font-weight: 600;
+    font-weight: 600 !important;
     margin: 0;
 }
 
@@ -1060,7 +1059,7 @@ h2 {
 }
 
 h3 {
-    margin-bottom: 16px;
+    margin-bottom: 16px !important;
 }
 
 input, output, .const-input {
@@ -1091,9 +1090,10 @@ legend {
 label, .label-like {
     font-size: 14px;
     line-height: 20px;
-    display: flex;
+    display: flex !important;
     justify-content: space-between;
-    font-weight: 500;
+    font-weight: 500 !important;
+    margin-bottom: 0 !important;
 }
 
 header {

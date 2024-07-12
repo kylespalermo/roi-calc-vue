@@ -182,7 +182,7 @@ export default {
                 },
                 withFivetran: {
                     value: 0,
-                    annotation: 'Reduced deestination ingestion costs with Fivetran',
+                    annotation: 'Reduced destination ingestion costs with Fivetran',
                     increment: 1000
                 }
             },

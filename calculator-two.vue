@@ -1,8 +1,4 @@
 <script>
-//TO DO:
-//1. BUILD IN MIN & MAX VALUES
-
-//default value appears to be unecessary when using v-model
 export default {
     data() {
         return {
@@ -697,7 +693,11 @@ export default {
                                 <legend class="hidden">Revenue gains</legend>
                                 <span>Additional gross revenue ($)</span>
                                 <span>Margin (percent)</span>
-                                <span>Annual net gain</span>
+                                <span>
+                                    Annual net gain
+                                    <i class="tooltip" data-roi-tooltip="IDC calculated that organizations achieved
+                                    $83,234 in additional net revenue per year from using Fivetran and better harnessing data."></i>
+                                </span>
                                 <span>Include?</span>
                             </div>
                             <div class="input-row">
@@ -823,9 +823,28 @@ export default {
             <button onclick="window.print()">Print report</button>
         </div>
     </main>
+    <div class="screen-size-error">
+        <h2>Sorry, this experience isn’t optimized for your screen size.</h2>
+        <p>Please expand your browser window or come back on a larger device. You can also explore our <a href="https://www.fivetran.com/blog/new-idc-analysis-the-value-of-fivetran-for-enterprise">blog entry</a> on the ROI of Fivetran.</p>
+    </div>
 </template>
 
 <style>
+
+.screen-size-error {
+    width: 100%;
+    padding: 20px;
+    border-radius: 4px;
+    background: var(--gray-05);
+    border: 1px solid var(--gray-40);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    display: none;
+    p {
+        line-height: 24px;
+    }
+}
 
 .grand-total {
     background: var(--blue-60) !important;
@@ -1019,6 +1038,8 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    margin-left: 12px;
+    margin-right: 12px;
 }
 
 form {
@@ -1165,7 +1186,7 @@ header ul {
 .field-box {
     display: flex;
     align-items: center;
-    flex-basis: 50%;
+    flex: 1 1 auto;
     gap: 20px;
     padding: 12px;
     border-radius: 4px;
@@ -1210,6 +1231,7 @@ header ul {
     font-size: 12px;
     line-height: 14px;
     display: unset;
+    justify-content: flex-end;
 }
 
 label.required::after {
@@ -1252,27 +1274,26 @@ output {
 }
 
 #data-integration-cost-and-maintenance {
-    grid-template-areas: 
-    "one one one one one one one one one one one one"
-    "two two two two . . . . . . . ."
-    "three three three three three three three three three three . ."
-    "four four four four four four four four four four . ."
-    "five five five five five five five five five five . ."
-    "six six six six six six six six six six . ."
-    "seven seven seven seven eight eight eight eight . . . ."
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+}
+
+#data-integration-cost-and-maintenance > * {
+    max-width: 1030px;
 }
 
 #data-integration-cost-and-maintenance h2 {
-    grid-area: one;
+    grid-column: 1 / span 12;
 }
 
 #number-of-engineers {
-    grid-area: two;
+    grid-column: 1 / span 4;
 }
 
 #data-integration-cost-and-maintenance > fieldset { 
     display: grid;
     grid-template-columns: subgrid;
+    grid-column: 1 / span 12;
 }
 
 #data-integration-cost-and-maintenance > fieldset > *, #total-time  {
@@ -1283,39 +1304,27 @@ output {
     align-items: center;
 }
 
-#pipelines {
-    grid-area: three;
-}
-
 #data-integration-cost-and-maintenance .row-header {
     margin-bottom: 0;
 }
 
-#transformations {
-    grid-area: four;
-}
-
 #total-time {
     padding: 12px;
-    grid-area: five;
     background: var(--gray-10);
     margin-left: -12px;
     margin-right: -12px;
     border-radius: 4px;
     border: 1px solid var(--gray-40);
     margin-bottom: 20px;
-}
-
-#additional-comparisons-and-costs {
-    grid-area: six;
+    grid-column: 1 / span 12;
 }
 
 #cost-of-data-downtime-per-hour {
-    grid-area: seven;
+    grid-column: 1 / span 4;
 }
 
 #additional-costs {
-    grid-area: eight;
+    grid-column: 5 / span 4;
 }
 
 #business-impact-of-fivetran {
@@ -1402,9 +1411,51 @@ input[type="checkbox"] {
     gap: 20px;
     align-items: start;
     height: min-content;
+    flex-wrap: wrap;
 }
 
 .subgrid { grid-template-columns: subgrid; }
+
+.tooltip {
+    position: relative;
+    background-image: url("https://uploads-ssl.webflow.com/624da42b5f2beca5145266dc/669963ad262295ee15d8b140_icon.svg");
+    background-repeat: no-repeat;
+    background-position: 50% 100%;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    justify-content: center;
+}
+
+.tooltip:hover::before {
+    content: attr(data-roi-tooltip);
+    display: block;
+    position: absolute;
+    background: var(--gray-90);
+    bottom: 1.6rem;
+    width: 25ch;
+    padding: 12px;
+    color: white;
+    border-radius: 4px;
+    font-weight: 400;
+    text-align: left;
+    font-style: normal;
+    filter: drop-shadow(0px 2px 8px #2222221a);
+}
+
+@media only screen and (max-width: 991px) {
+    form, .report {
+        background: blue;
+        display: none;
+    }
+    main {
+        margin: 0;
+        padding: 0;
+    }
+    .screen-size-error {
+        display: flex;
+    }
+}
 
 @media print {
 

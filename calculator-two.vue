@@ -268,7 +268,6 @@ export default {
             },
 
             operationalCostSavings: {
-                oneTime: { value: 285714 },
                 annual: { value: 177400 },
                 include: { value: false },
             }
@@ -318,12 +317,6 @@ export default {
         annualNetGain() {
             return this.revenueGains.additionalGrossRevenue.value * (this.revenueGains.margin.value/100);
         },
-        
-        //associated with Operational Cost Savings line, last IDC input
-        averageAnnualSaving() {
-            return this.operationalCostSavings.oneTime.value + this.operationalCostSavings.annual.value
-        }
-        
     },
     methods: {
         calculateIDCGains(salary, equivalentProductivityLevel, productivityGain) {
@@ -480,8 +473,9 @@ export default {
 
             this.reportOutputs.idcRevenueGains = {}
 
-            if (this.operationalCostSavings.include.value) { this.reportOutputs.idcRevenueGains.operationalCostSavings = this.averageAnnualSaving }
             if (this.revenueGains.include.value) { this.reportOutputs.idcRevenueGains.revenueGains = this.annualNetGain }
+            if (this.operationalCostSavings.include.value) { this.reportOutputs.idcRevenueGains.operationalCostSavings = this.operationalCostSavings.annual.value }
+
 
             this.reportSums.dataIntegrationCostAndMaintenance = this.sumReportLines(this.reportOutputs.dataIntegrationCostAndMaintenance);
             this.reportSums.idcProductivityGains = this.sumReportLines(this.reportOutputs.idcProductivityGains, ['currentState', 'withFivetran', 'averageAnnualGain']);
@@ -712,19 +706,18 @@ export default {
                             </div>
                         </fieldset>
                         <!-- operational cost savings -->
-                        <fieldset>
+                        <fieldset id="operational-cost-savings">
                             <div class="row-header">
                                 <legend class="hidden">Operational cost savings</legend>
-                                <span>One-time ($)</span>
-                                <span>Annual</span>
-                                <span>Average annual saving</span>
+                                <span>Average annual saving<i class="tooltip" data-roi-tooltip="Overall, Fivetran customers saw an average of $177,400 in annual operational cost savings."></i></span>
                                 <span>Include?</span>
                             </div>
                             <div class="input-row">
-                                <div class="label-like">Operational cost savings</div>
-                                <input v-model="this.operationalCostSavings.oneTime.value" id="operationalCostSavings_oneTime" type="number" min="0">
+                                <div class="label-like annotated-label">
+                                    Operational cost savings
+                                    <p>The study found that Fivetran helped organizations reduce bad technical debt and bemore operationally resilient to business challenges. As a result, interviewed organizations recognized operational cost savings.</p>
+                                </div>
                                 <input v-model="this.operationalCostSavings.annual.value" id="operationalCostSavings_annual" type="number" min="0">
-                                <output>{{ this.formatDollars(this.averageAnnualSaving) }}</output>
                                 <input v-model="this.operationalCostSavings.include.value" id="operationalCostSavings_inlclude" type="checkbox">
                             </div>
                         </fieldset>
@@ -830,6 +823,14 @@ export default {
 </template>
 
 <style>
+
+.hidden {
+    visibility: hidden;
+}
+
+#revenue-gains .row-header, #operational-cost-savings .row-header {
+    margin-bottom: 16px;
+}
 
 .screen-size-error {
     width: 100%;
@@ -1149,8 +1150,9 @@ header ul {
 .row-header {
     border-bottom: 1px solid var(--gray-90) !important;
     padding: 0px 0px 8px 0px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     font-weight: 600 !important;
+    align-items: flex-end;
 }
 
 .row-header *:nth-child(n+2), .report-table-row *:nth-child(n+2) {
@@ -1416,13 +1418,20 @@ input[type="checkbox"] {
 
 .subgrid { grid-template-columns: subgrid; }
 
+span:has(.tooltip) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+}
+
 .tooltip {
     position: relative;
     background-image: url("https://uploads-ssl.webflow.com/624da42b5f2beca5145266dc/669963ad262295ee15d8b140_icon.svg");
     background-repeat: no-repeat;
     background-position: 50% 100%;
     width: 16px;
-    height: 16px;
+    height: 14px;
     display: inline-flex;
     justify-content: center;
 }

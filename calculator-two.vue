@@ -356,8 +356,8 @@ export default {
                 return null;
             }
 
-            let currentState = currentStateHours * this.workSchedule.weeksWorkedPerYear.value * this.equivalentHourlyRate;
-            let withFivetran = withFivetranHours * this.workSchedule.weeksWorkedPerYear.value * this.equivalentHourlyRate;
+            let currentState = currentStateHours * this.numberOfEngineers.value * this.workSchedule.weeksWorkedPerYear.value * this.equivalentHourlyRate;
+            let withFivetran = withFivetranHours * this.numberOfEngineers.value * this.workSchedule.weeksWorkedPerYear.value * this.equivalentHourlyRate;
             let costSavings = this.calculateCostSavings(currentState, withFivetran)
             
             return {
@@ -1188,7 +1188,7 @@ header ul {
 .field-box {
     display: flex;
     align-items: center;
-    flex: 1 1 auto;
+    flex: 1 1 48%;
     gap: 20px;
     padding: 12px;
     border-radius: 4px;
